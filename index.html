@@ -3,47 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gấu Bắc Cực Học Tiếng Trung</title>
+    <title>Gấu Tuyết Học Tiếng Trung</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Quicksand:wght@500;700&display=swap');
+        /* Thêm font chữ dễ thương 'Mali' */
+        @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
 
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --text-color: #1e3a8a;
-            --accent-color: #3b82f6;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --text-color: #5b21b6; /* Tím đậm cute */
+            --primary-pink: #f472b6;
         }
 
         .dark {
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(51, 65, 85, 0.6);
-            --text-color: #e2e8f0;
-            --accent-color: #60a5fa;
+            --glass-bg: rgba(30, 20, 50, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-color: #fce7f3;
         }
 
         body {
-            font-family: 'Quicksand', sans-serif;
-            background: linear-gradient(to bottom, #dbeafe, #eff6ff); /* Ice Blue */
+            font-family: 'Mali', cursive; /* Font chữ cute */
+            /* Gradient màu kẹo ngọt: Hồng -> Tím nhạt -> Xanh */
+            background: linear-gradient(135deg, #fff0f5 0%, #e0c3fc 50%, #dbeafe 100%);
+            background-attachment: fixed;
             transition: background 0.5s ease;
             overflow-x: hidden;
+            color: var(--text-color);
         }
 
         body.dark {
-            background: linear-gradient(to bottom, #0f172a, #1e293b); /* Night Sky */
+            background: linear-gradient(to bottom, #2e1065, #4c1d95, #1e1b4b);
         }
 
         .cn-font {
             font-family: 'Noto Sans SC', sans-serif;
         }
 
-        /* Snow Effect */
+        /* Snow & Heart Effect */
         .snowflake {
             color: #fff;
-            font-size: 1em;
-            font-family: Arial, sans-serif;
-            text-shadow: 0 0 5px #000;
             position: fixed;
             top: -10%;
             z-index: 0;
@@ -54,11 +54,13 @@
             animation-timing-function: linear, ease-in-out;
             animation-iteration-count: infinite, infinite;
             animation-play-state: running, running;
+            opacity: 0.8;
         }
         
         .dark .snowflake {
             color: #e2e8f0;
-            opacity: 0.5;
+            opacity: 0.6;
+            text-shadow: 0 0 5px rgba(255,255,255,0.5);
         }
 
         @keyframes snowflakes-fall {
@@ -70,26 +72,29 @@
             50% { transform: translateX(80px); }
         }
 
-        /* Glassmorphism Card */
+        /* Glassmorphism Card - Siêu bo tròn */
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid var(--glass-border);
+            border-radius: 24px; /* Bo tròn nhiều hơn */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glass-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 15px 30px rgba(236, 72, 153, 0.15); /* Bóng màu hồng */
+            border-color: #fbcfe8;
         }
 
         /* Bear Animation */
         .bear-container {
-            animation: breathe 3s infinite ease-in-out;
+            animation: bounce 3s infinite ease-in-out;
         }
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         /* Flip Card */
@@ -105,103 +110,132 @@
             75% { transform: translateX(5px); }
         }
         .shake-anim { animation: shake 0.3s ease-in-out; }
+
+        /* Custom Scrollbar for Tabs */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 transition-colors duration-300">
+<body class="min-h-screen transition-colors duration-300">
 
     <!-- Snow Container -->
-    <div id="snow-container" class="pointer-events-none"></div>
+    <div id="snow-container" class="pointer-events-none fixed inset-0 z-0"></div>
 
     <!-- Top Navigation -->
-    <nav class="sticky top-0 z-50 glass-card shadow-sm border-b-0 rounded-b-xl mx-2 mt-1">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <nav class="sticky top-4 z-50 glass-card shadow-lg mx-4 mt-2 mb-4 px-2">
+        <div class="container mx-auto px-2 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <i class="fas fa-paw text-2xl text-blue-500"></i>
-                <h1 class="text-xl font-bold text-blue-700 dark:text-blue-300 hidden md:block">HuynhNhu</h1>
+                <div class="bg-pink-100 p-2 rounded-full">
+                    <i class="fas fa-heart text-2xl text-pink-500 animate-pulse"></i>
+                </div>
+                <h1 class="text-xl font-bold text-pink-600 dark:text-pink-300 hidden md:block tracking-wide">HuynhNhu's Class</h1>
             </div>
             
             <div class="flex items-center gap-3">
                 <!-- Search -->
-                <div class="relative">
-                    <input type="text" id="searchInput" placeholder="Tìm kiếm..." 
-                           class="pl-9 pr-4 py-1.5 rounded-full bg-blue-50 dark:bg-slate-700 border-none focus:ring-2 focus:ring-blue-300 w-32 md:w-48 text-sm transition-all">
-                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                <div class="relative group">
+                    <input type="text" id="searchInput" placeholder="Tìm từ..." 
+                           class="pl-10 pr-4 py-2 rounded-full bg-white/80 dark:bg-slate-700/80 border-2 border-pink-100 dark:border-slate-600 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 w-36 md:w-56 text-sm transition-all shadow-sm outline-none text-slate-700 dark:text-white placeholder-pink-300">
+                    <i class="fas fa-search absolute left-3.5 top-3 text-pink-400 text-sm group-hover:scale-110 transition-transform"></i>
                 </div>
 
                 <!-- Dark Mode Toggle -->
-                <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-blue-100 dark:hover:bg-slate-600 transition-colors">
-                    <i id="themeIcon" class="fas fa-moon text-blue-600 dark:text-yellow-300"></i>
+                <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full bg-white/80 dark:bg-slate-700 hover:bg-purple-100 dark:hover:bg-slate-600 transition-colors shadow-sm flex items-center justify-center text-purple-500">
+                    <i id="themeIcon" class="fas fa-moon"></i>
                 </button>
 
                 <!-- Settings Toggle -->
-                <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-blue-100 dark:hover:bg-slate-600 transition-colors">
-                    <i class="fas fa-cog text-gray-500 dark:text-gray-300"></i>
+                <button onclick="toggleSettings()" class="w-10 h-10 rounded-full bg-white/80 dark:bg-slate-700 hover:bg-pink-100 dark:hover:bg-slate-600 transition-colors shadow-sm flex items-center justify-center text-pink-500">
+                    <i class="fas fa-cog animate-spin-slow"></i>
                 </button>
             </div>
         </div>
         
         <!-- Audio Settings Panel (Hidden) -->
-        <div id="settingsPanel" class="hidden absolute right-4 top-16 w-64 glass-card p-4 rounded-xl shadow-xl z-50">
-            <h3 class="font-bold mb-2 dark:text-white">Cài đặt giọng đọc</h3>
-            <div class="mb-3">
-                <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1">Tốc độ đọc</label>
-                <input type="range" id="rateInput" min="0.5" max="1.5" step="0.1" value="1" class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer">
-                <div class="flex justify-between text-xs text-gray-500">
+        <div id="settingsPanel" class="hidden absolute right-0 top-16 w-72 glass-card p-5 rounded-3xl shadow-xl z-50 mr-4">
+            <h3 class="font-bold mb-3 text-pink-600 dark:text-pink-300 border-b border-pink-100 pb-2"><i class="fas fa-sliders-h mr-2"></i>Cài đặt giọng đọc</h3>
+            <div class="mb-4">
+                <label class="text-xs font-bold text-gray-500 dark:text-gray-300 block mb-2">Tốc độ đọc</label>
+                <input type="range" id="rateInput" min="0.5" max="1.5" step="0.1" value="1" class="w-full h-2 bg-pink-200 rounded-lg appearance-none cursor-pointer accent-pink-500">
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
                     <span>Chậm</span>
                     <span>Chuẩn</span>
                     <span>Nhanh</span>
                 </div>
             </div>
             <div>
-                <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1">Giọng đọc (nếu có)</label>
-                <select id="voiceSelect" class="w-full text-sm p-1 rounded border dark:bg-slate-700 dark:text-white dark:border-slate-600"></select>
+                <label class="text-xs font-bold text-gray-500 dark:text-gray-300 block mb-2">Chọn giọng (nếu có)</label>
+                <select id="voiceSelect" class="w-full text-sm p-2 rounded-xl border border-pink-200 bg-pink-50 dark:bg-slate-700 dark:text-white dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-pink-300"></select>
             </div>
         </div>
     </nav>
 
     <!-- Header / Mascot Area -->
-    <header class="container mx-auto px-4 py-6 text-center relative z-10">
-        <div class="bear-container inline-block relative mb-4">
-            <!-- SVG Polar Bear -->
-            <svg width="120" height="120" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="100" cy="100" r="90" fill="white" stroke="#E2E8F0" stroke-width="4"/>
-                <path d="M60 70C60 70 70 50 100 50C130 50 140 70 140 70" stroke="#CBD5E1" stroke-width="8" stroke-linecap="round"/>
-                <circle cx="75" cy="90" r="8" fill="#1E293B"/>
-                <circle cx="125" cy="90" r="8" fill="#1E293B"/>
-                <ellipse cx="100" cy="110" rx="12" ry="8" fill="#1E293B"/>
-                <path d="M100 118V130" stroke="#1E293B" stroke-width="3"/>
-                <path d="M90 130Q100 140 110 130" stroke="#1E293B" stroke-width="3" fill="none"/>
-                <circle cx="50" cy="60" r="15" fill="white" stroke="#E2E8F0" stroke-width="4"/>
-                <circle cx="150" cy="60" r="15" fill="white" stroke="#E2E8F0" stroke-width="4"/>
-                <path d="M85 100C85 100 70 105 70 115" stroke="#FFB6C1" stroke-width="3" opacity="0.6"/>
-                <path d="M115 100C115 100 130 105 130 115" stroke="#FFB6C1" stroke-width="3" opacity="0.6"/>
+    <header class="container mx-auto px-4 py-4 text-center relative z-10">
+        <div class="bear-container inline-block relative mb-2 group">
+            <!-- SVG Cute Bear with Pink Theme -->
+            <svg width="140" height="140" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-xl">
+                <!-- Ears -->
+                <circle cx="50" cy="60" r="18" fill="white" stroke="#fce7f3" stroke-width="4"/>
+                <circle cx="50" cy="60" r="10" fill="#fbcfe8"/>
+                <circle cx="150" cy="60" r="18" fill="white" stroke="#fce7f3" stroke-width="4"/>
+                <circle cx="150" cy="60" r="10" fill="#fbcfe8"/>
+                
+                <!-- Face -->
+                <circle cx="100" cy="100" r="90" fill="white" stroke="#fce7f3" stroke-width="4"/>
+                
+                <!-- Eyes -->
+                <circle cx="70" cy="90" r="10" fill="#374151"/>
+                <circle cx="73" cy="87" r="3" fill="white"/> <!-- Sparkle -->
+                <circle cx="130" cy="90" r="10" fill="#374151"/>
+                <circle cx="133" cy="87" r="3" fill="white"/> <!-- Sparkle -->
+                
+                <!-- Cheeks (Blush) -->
+                <ellipse cx="60" cy="115" rx="12" ry="8" fill="#f9a8d4" opacity="0.6"/>
+                <ellipse cx="140" cy="115" rx="12" ry="8" fill="#f9a8d4" opacity="0.6"/>
+                
+                <!-- Nose & Mouth -->
+                <path d="M60 70C60 70 70 50 100 50C130 50 140 70 140 70" stroke="#fdf2f8" stroke-width="0" stroke-linecap="round"/>
+                <ellipse cx="100" cy="110" rx="14" ry="10" fill="#374151"/>
+                <path d="M100 120V135" stroke="#374151" stroke-width="3"/>
+                <path d="M90 135Q100 145 110 135" stroke="#374151" stroke-width="3" fill="none"/>
+                
+                <!-- Bow Tie (Nơ) -->
+                <path d="M100 160 L80 145 L80 175 Z" fill="#f472b6"/>
+                <path d="M100 160 L120 145 L120 175 Z" fill="#f472b6"/>
+                <circle cx="100" cy="160" r="8" fill="#ec4899"/>
             </svg>
-            <div class="absolute -bottom-2 -right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                <span id="progressCount">0</span>/1200
+            <div class="absolute -bottom-2 -right-4 bg-white/90 dark:bg-slate-800 border-2 border-pink-200 text-pink-500 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg rotate-3 group-hover:rotate-0 transition-transform">
+                Đã học: <span id="progressCount" class="text-lg">0</span>/1200
             </div>
         </div>
-        <h2 class="text-2xl md:text-3xl font-bold text-blue-800 dark:text-blue-200 mb-2">Cùng HuynhNhu Học Tiếng Trung</h2>
-        <p class="text-blue-600 dark:text-blue-300 text-sm">Chinh phục 1200 từ vựng HSK 1-4</p>
+        <h2 class="text-3xl md:text-4xl font-bold text-purple-700 dark:text-purple-300 mb-1 drop-shadow-sm">Cùng HuynhNhu Học Tiếng Trung</h2>
+        <p class="text-pink-500 dark:text-pink-300 font-medium text-base"><i class="fas fa-star text-yellow-400 mr-1"></i> Chinh phục 1200 từ vựng HSK 1-4 <i class="fas fa-star text-yellow-400 ml-1"></i></p>
     </header>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-4 pb-20 relative z-10">
+    <main class="container mx-auto px-4 pb-20 relative z-10 max-w-6xl">
         
         <!-- Controls & Tabs -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-5">
             <!-- Level Tabs -->
-            <div class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide" id="levelTabs">
-                <button onclick="setLevel(1)" class="tab-btn active px-4 py-2 rounded-lg bg-white dark:bg-slate-700 shadow-sm border border-blue-100 dark:border-slate-600 text-sm font-bold text-blue-600 whitespace-nowrap hover:bg-blue-50 transition">HSK 1 (150)</button>
-                <button onclick="setLevel(2)" class="tab-btn px-4 py-2 rounded-lg bg-white/50 dark:bg-slate-800/50 shadow-sm border border-transparent text-sm font-medium text-gray-500 whitespace-nowrap hover:bg-white transition">HSK 2 (150)</button>
-                <button onclick="setLevel(3)" class="tab-btn px-4 py-2 rounded-lg bg-white/50 dark:bg-slate-800/50 shadow-sm border border-transparent text-sm font-medium text-gray-500 whitespace-nowrap hover:bg-white transition">HSK 3 (150)</button>
-                <button onclick="setLevel(4)" class="tab-btn px-4 py-2 rounded-lg bg-white/50 dark:bg-slate-800/50 shadow-sm border border-transparent text-sm font-medium text-gray-500 whitespace-nowrap hover:bg-white transition">HSK 4 (600)</button>
+            <div class="flex gap-3 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide px-1" id="levelTabs">
+                <button onclick="setLevel(1)" class="tab-btn active px-6 py-2.5 rounded-2xl bg-white dark:bg-slate-700 shadow-md border-2 border-pink-200 dark:border-slate-600 text-sm font-bold text-pink-500 whitespace-nowrap hover:bg-pink-50 transition transform hover:-translate-y-1">HSK 1 (150)</button>
+                <button onclick="setLevel(2)" class="tab-btn px-6 py-2.5 rounded-2xl bg-white/60 dark:bg-slate-800/60 shadow-sm border-2 border-transparent text-sm font-bold text-gray-500 dark:text-gray-400 whitespace-nowrap hover:bg-white hover:border-pink-100 transition">HSK 2 (150)</button>
+                <button onclick="setLevel(3)" class="tab-btn px-6 py-2.5 rounded-2xl bg-white/60 dark:bg-slate-800/60 shadow-sm border-2 border-transparent text-sm font-bold text-gray-500 dark:text-gray-400 whitespace-nowrap hover:bg-white hover:border-pink-100 transition">HSK 3 (150)</button>
+                <button onclick="setLevel(4)" class="tab-btn px-6 py-2.5 rounded-2xl bg-white/60 dark:bg-slate-800/60 shadow-sm border-2 border-transparent text-sm font-bold text-gray-500 dark:text-gray-400 whitespace-nowrap hover:bg-white hover:border-pink-100 transition">HSK 4 (600)</button>
             </div>
 
             <!-- Mode Switcher -->
-            <div class="flex bg-blue-100 dark:bg-slate-700 p-1 rounded-lg">
-                <button onclick="setMode('list')" id="btn-list" class="px-3 py-1.5 rounded-md bg-white dark:bg-slate-600 shadow text-blue-600 dark:text-blue-200 text-sm font-bold transition-all"><i class="fas fa-list mr-1"></i> List</button>
-                <button onclick="setMode('flashcard')" id="btn-flashcard" class="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-blue-600 transition-all"><i class="fas fa-clone mr-1"></i> Thẻ</button>
-                <button onclick="setMode('quiz')" id="btn-quiz" class="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-blue-600 transition-all"><i class="fas fa-gamepad mr-1"></i> Game</button>
+            <div class="flex bg-white/70 dark:bg-slate-800/70 p-1.5 rounded-2xl shadow-sm backdrop-blur-sm border border-pink-100 dark:border-slate-600">
+                <button onclick="setMode('list')" id="btn-list" class="px-4 py-2 rounded-xl bg-pink-100 dark:bg-pink-900 shadow-sm text-pink-600 dark:text-pink-200 text-sm font-bold transition-all"><i class="fas fa-list-ul mr-2"></i>List</button>
+                <button onclick="setMode('flashcard')" id="btn-flashcard" class="px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 text-sm font-bold hover:text-pink-500 transition-all"><i class="fas fa-layer-group mr-2"></i>Thẻ</button>
+                <button onclick="setMode('quiz')" id="btn-quiz" class="px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 text-sm font-bold hover:text-pink-500 transition-all"><i class="fas fa-puzzle-piece mr-2"></i>Game</button>
             </div>
         </div>
 
@@ -211,38 +245,51 @@
         </div>
 
         <!-- VIEW: Flashcard Mode -->
-        <div id="view-flashcard" class="hidden flex flex-col items-center justify-center min-h-[400px]">
-            <div class="relative w-full max-w-md h-80 group cursor-pointer perspective-1000" onclick="flipCard(this)">
-                <div id="flashcard-inner" class="relative w-full h-full duration-500 transform-style-3d shadow-xl rounded-2xl">
+        <div id="view-flashcard" class="hidden flex flex-col items-center justify-center min-h-[450px]">
+            <div class="relative w-full max-w-md h-96 group cursor-pointer perspective-1000" onclick="flipCard(this)">
+                <div id="flashcard-inner" class="relative w-full h-full duration-700 transform-style-3d shadow-2xl rounded-3xl">
                     <!-- Front -->
-                    <div class="absolute w-full h-full bg-white dark:bg-slate-800 rounded-2xl flex flex-col items-center justify-center backface-hidden border-2 border-blue-100 dark:border-slate-600">
-                        <span class="text-xs font-bold text-blue-400 mb-2">HÁN TỰ</span>
-                        <h2 id="fc-hanzi" class="text-6xl font-bold text-slate-800 dark:text-white cn-font mb-2">...</h2>
-                        <p id="fc-front-pinyin" class="text-xl text-blue-500 font-medium mb-4">...</p>
-                        <button onclick="event.stopPropagation(); playAudio('fc-hanzi')" class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 flex items-center justify-center transition">
-                            <i class="fas fa-volume-up"></i>
-                        </button>
-                        <p class="text-gray-400 text-sm mt-4 italic">(Chạm để lật)</p>
+                    <div class="absolute w-full h-full bg-white dark:bg-slate-800/90 rounded-3xl flex flex-col items-center justify-center backface-hidden border-4 border-pink-100 dark:border-slate-600 overflow-hidden">
+                        <!-- Decorative background circle -->
+                        <div class="absolute top-[-50px] right-[-50px] w-32 h-32 bg-pink-50 dark:bg-slate-700 rounded-full z-0"></div>
+                        <div class="absolute bottom-[-20px] left-[-20px] w-24 h-24 bg-blue-50 dark:bg-slate-700 rounded-full z-0"></div>
+                        
+                        <div class="z-10 text-center">
+                            <span class="inline-block px-3 py-1 bg-pink-100 text-pink-500 text-xs font-bold rounded-full mb-4">HÁN TỰ</span>
+                            <h2 id="fc-hanzi" class="text-7xl font-bold text-slate-700 dark:text-white cn-font mb-3 drop-shadow-sm">...</h2>
+                            <p id="fc-front-pinyin" class="text-2xl text-pink-500 font-bold mb-6 font-mono">...</p>
+                            
+                            <button onclick="event.stopPropagation(); playAudio('fc-hanzi')" class="w-14 h-14 rounded-full bg-gradient-to-tr from-pink-400 to-purple-400 text-white shadow-lg hover:shadow-pink-300/50 flex items-center justify-center transition transform hover:scale-110 active:scale-95">
+                                <i class="fas fa-volume-up text-xl"></i>
+                            </button>
+                        </div>
+                        <p class="absolute bottom-6 text-gray-400 text-sm italic flex items-center gap-1"><i class="fas fa-hand-pointer animate-bounce"></i> Chạm để lật</p>
                     </div>
                     <!-- Back -->
-                    <div class="absolute w-full h-full bg-blue-50 dark:bg-slate-700 rounded-2xl flex flex-col items-center justify-center backface-hidden rotate-y-180 border-2 border-blue-200 dark:border-slate-500 p-6 text-center">
-                        <h3 id="fc-pinyin" class="text-2xl font-bold text-blue-600 mb-1">...</h3>
-                        <p id="fc-meaning" class="text-xl text-slate-700 dark:text-slate-200 font-semibold mb-4">...</p>
-                        <div class="bg-white/60 dark:bg-slate-800/60 p-3 rounded-lg w-full">
-                            <p id="fc-example" class="cn-font text-lg text-slate-800 dark:text-slate-300 mb-1">...</p>
-                            <p id="fc-example-meaning" class="text-sm text-gray-500 dark:text-gray-400">...</p>
+                    <div class="absolute w-full h-full bg-gradient-to-br from-pink-50 to-purple-50 dark:from-slate-800 dark:to-slate-900 rounded-3xl flex flex-col items-center justify-center backface-hidden rotate-y-180 border-4 border-purple-100 dark:border-slate-500 p-6 text-center">
+                        <h3 id="fc-pinyin" class="text-3xl font-bold text-purple-600 dark:text-purple-300 mb-2 font-mono hidden">...</h3>
+                        <p id="fc-meaning" class="text-2xl text-slate-800 dark:text-white font-bold mb-6">...</p>
+                        
+                        <div class="bg-white/70 dark:bg-slate-700/70 p-4 rounded-2xl w-full border border-white/50 dark:border-slate-500 shadow-sm relative">
+                            <i class="fas fa-quote-left absolute -top-3 -left-2 text-pink-300 text-2xl"></i>
+                            <p id="fc-example" class="cn-font text-xl text-slate-700 dark:text-slate-200 mb-2 font-medium">...</p>
+                            <p id="fc-example-meaning" class="text-sm text-gray-500 dark:text-gray-400 italic">...</p>
                         </div>
-                         <button onclick="event.stopPropagation(); playAudio('fc-example')" class="mt-2 text-blue-500 hover:text-blue-700">
-                            <i class="fas fa-volume-up"></i> Nghe câu
+                         <button onclick="event.stopPropagation(); playAudio('fc-example')" class="mt-4 px-4 py-2 bg-white dark:bg-slate-700 rounded-xl text-pink-500 text-sm font-bold shadow hover:bg-pink-50 transition">
+                            <i class="fas fa-volume-up mr-2"></i> Nghe câu ví dụ
                         </button>
                     </div>
                 </div>
             </div>
             
-            <div class="flex gap-4 mt-8">
-                <button onclick="prevFlashcard()" class="w-12 h-12 rounded-full bg-white dark:bg-slate-700 shadow-md text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-arrow-left"></i></button>
-                <button onclick="markLearned()" class="px-6 py-2 rounded-full bg-green-500 text-white font-bold shadow-md hover:bg-green-600 transition"><i class="fas fa-check mr-2"></i>Đã thuộc</button>
-                <button onclick="nextFlashcard()" class="w-12 h-12 rounded-full bg-white dark:bg-slate-700 shadow-md text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-arrow-right"></i></button>
+            <div class="flex gap-6 mt-10">
+                <button onclick="prevFlashcard()" class="w-14 h-14 rounded-full bg-white dark:bg-slate-700 shadow-lg border-b-4 border-gray-100 dark:border-slate-800 text-gray-400 hover:text-pink-500 hover:border-pink-200 transition transform hover:-translate-y-1 active:translate-y-0"><i class="fas fa-chevron-left text-xl"></i></button>
+                
+                <button onclick="markLearned()" class="px-8 py-3 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold shadow-lg shadow-green-200 dark:shadow-none hover:shadow-xl transition transform hover:-translate-y-1 active:translate-y-0 flex items-center gap-2">
+                    <i class="fas fa-check-circle text-xl"></i> Đã thuộc
+                </button>
+                
+                <button onclick="nextFlashcard()" class="w-14 h-14 rounded-full bg-white dark:bg-slate-700 shadow-lg border-b-4 border-gray-100 dark:border-slate-800 text-gray-400 hover:text-pink-500 hover:border-pink-200 transition transform hover:-translate-y-1 active:translate-y-0"><i class="fas fa-chevron-right text-xl"></i></button>
             </div>
         </div>
 
@@ -250,49 +297,58 @@
         <div id="view-quiz" class="hidden max-w-2xl mx-auto">
             
             <!-- Game Selection -->
-            <div id="game-selection" class="grid grid-cols-2 gap-4 mb-6">
-                <button onclick="startQuiz('practice')" class="glass-card p-6 rounded-xl text-center hover:bg-blue-50 transition">
-                    <i class="fas fa-graduation-cap text-4xl text-blue-500 mb-3"></i>
-                    <h3 class="font-bold text-lg">Luyện tập</h3>
-                    <p class="text-sm text-gray-500">Làm thoải mái, không áp lực</p>
+            <div id="game-selection" class="grid grid-cols-2 gap-6 mb-6">
+                <button onclick="startQuiz('practice')" class="glass-card p-8 rounded-3xl text-center hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50 transition group border-2 border-transparent hover:border-blue-200">
+                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-book-reader text-4xl text-blue-500"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-700 dark:text-white">Luyện tập</h3>
+                    <p class="text-sm text-gray-500 mt-2">Thư giãn, không áp lực</p>
                 </button>
-                <button onclick="startQuiz('survival')" class="glass-card p-6 rounded-xl text-center hover:bg-red-50 transition border-red-100">
-                    <i class="fas fa-fire text-4xl text-red-500 mb-3"></i>
-                    <h3 class="font-bold text-lg">Sinh tồn</h3>
-                    <p class="text-sm text-gray-500">Sai là dừng lại!</p>
+                <button onclick="startQuiz('survival')" class="glass-card p-8 rounded-3xl text-center hover:bg-gradient-to-br hover:from-red-50 hover:to-pink-50 transition group border-2 border-transparent hover:border-red-200">
+                    <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-heart-pulse text-4xl text-red-500"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-700 dark:text-white">Sinh tồn</h3>
+                    <p class="text-sm text-gray-500 mt-2">Sai 1 câu là dừng!</p>
                 </button>
             </div>
 
             <!-- Quiz Interface -->
-            <div id="quiz-interface" class="hidden glass-card p-8 rounded-2xl shadow-lg text-center relative">
-                <div class="absolute top-4 right-4 text-sm font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
-                    Score: <span id="quiz-score">0</span>
+            <div id="quiz-interface" class="hidden glass-card p-8 rounded-3xl shadow-xl text-center relative border-4 border-white/50">
+                <div class="absolute top-4 right-4 text-sm font-bold text-pink-600 bg-pink-100 px-4 py-1.5 rounded-full shadow-inner">
+                    <i class="fas fa-star text-yellow-400 mr-1"></i> Điểm: <span id="quiz-score">0</span>
                 </div>
 
-                <div class="mb-6 mt-4">
-                    <span class="text-sm text-gray-500 uppercase tracking-widest">Từ vựng này nghĩa là gì?</span>
-                    <h2 id="quiz-question" class="text-5xl font-bold text-blue-800 dark:text-white cn-font mt-2 mb-6">...</h2>
-                    <button onclick="playAudio('quiz-question')" class="text-blue-400 hover:text-blue-600"><i class="fas fa-volume-up text-xl"></i></button>
+                <div class="mb-8 mt-6">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-lg">Từ này nghĩa là gì?</span>
+                    <h2 id="quiz-question" class="text-6xl font-bold text-slate-700 dark:text-white cn-font mt-4 mb-4 drop-shadow-md">...</h2>
+                    <button onclick="playAudio('quiz-question')" class="text-pink-400 hover:text-pink-600 bg-pink-50 dark:bg-slate-700 p-3 rounded-full hover:bg-pink-100 transition"><i class="fas fa-volume-up text-xl"></i></button>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="quiz-options">
                     <!-- Options injected here -->
                 </div>
                 
-                <p id="quiz-feedback" class="mt-4 font-bold text-lg min-h-[1.75rem]"></p>
+                <div id="quiz-feedback" class="mt-6 font-bold text-xl min-h-[2rem] rounded-xl py-2 transition-all"></div>
                 
-                <div class="flex justify-center gap-4 mt-4">
-                    <button onclick="quitQuiz()" class="text-gray-400 hover:text-gray-600 underline">Thoát</button>
-                    <button onclick="nextQuizQuestion()" id="btn-next-quiz" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hidden">Câu tiếp theo</button>
+                <div class="flex justify-center gap-4 mt-6">
+                    <button onclick="quitQuiz()" class="px-4 py-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition">Thoát</button>
+                    <button onclick="nextQuizQuestion()" id="btn-next-quiz" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg hover:scale-105 transition font-bold hidden shadow-blue-200">Câu tiếp theo <i class="fas fa-arrow-right ml-2"></i></button>
                 </div>
             </div>
             
             <!-- Game Over Screen -->
-            <div id="game-over" class="hidden glass-card p-8 rounded-2xl shadow-lg text-center">
-                <i class="fas fa-trophy text-6xl text-yellow-400 mb-4"></i>
-                <h2 class="text-3xl font-bold text-slate-800 mb-2">Hoàn thành!</h2>
-                <p class="text-xl mb-6">Điểm số của bạn: <span id="final-score" class="font-bold text-blue-600">0</span></p>
-                <button onclick="resetQuizView()" class="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold shadow hover:bg-blue-700 transition">Chơi lại</button>
+            <div id="game-over" class="hidden glass-card p-10 rounded-3xl shadow-2xl text-center border-4 border-white/60">
+                <div class="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                    <i class="fas fa-trophy text-5xl text-yellow-500"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-slate-800 dark:text-white mb-2">Tuyệt vời!</h2>
+                <p class="text-gray-500 mb-6">Bạn đã hoàn thành lượt chơi này.</p>
+                <div class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-8">
+                    <span id="final-score">0</span> <span class="text-lg text-gray-400 font-normal">điểm</span>
+                </div>
+                <button onclick="resetQuizView()" class="px-8 py-3 bg-pink-500 text-white rounded-xl font-bold shadow-lg shadow-pink-200 hover:bg-pink-600 hover:-translate-y-1 transition w-full md:w-auto">Chơi lại nha</button>
             </div>
         </div>
 
@@ -562,11 +618,12 @@
             }
         };
 
-        // --- SNOWFALL EFFECT ---
+        // --- SNOWFALL EFFECT (Now with Hearts & Stars!) ---
         function createSnowflakes() {
             const container = document.getElementById('snow-container');
             const snowflakeCount = 30;
-            const characters = ['❄', '❅', '❆', '•'];
+            // Thêm trái tim và ngôi sao cho cute
+            const characters = ['❄', '❅', '❆', '❤', '✨', '🌸'];
             
             for (let i = 0; i < snowflakeCount; i++) {
                 const flake = document.createElement('div');
@@ -574,8 +631,10 @@
                 flake.innerText = characters[Math.floor(Math.random() * characters.length)];
                 flake.style.left = Math.random() * 100 + '%';
                 flake.style.animationDelay = Math.random() * 5 + 's, ' + Math.random() * 3 + 's';
-                flake.style.fontSize = (Math.random() * 10 + 10) + 'px';
-                flake.style.opacity = Math.random();
+                flake.style.fontSize = (Math.random() * 12 + 10) + 'px';
+                // Màu ngẫu nhiên nhạt
+                const randomColor = Math.random() > 0.7 ? '#f9a8d4' : (Math.random() > 0.5 ? '#fcd34d' : '#fff');
+                flake.style.color = randomColor;
                 container.appendChild(flake);
             }
         }
@@ -633,10 +692,12 @@
             
             const tabs = document.querySelectorAll('#levelTabs button');
             tabs.forEach((btn, idx) => {
+                // Reset styles
+                btn.className = "tab-btn px-6 py-2.5 rounded-2xl bg-white/60 dark:bg-slate-800/60 shadow-sm border-2 border-transparent text-sm font-bold text-gray-500 dark:text-gray-400 whitespace-nowrap hover:bg-white hover:border-pink-100 transition";
+                
+                // Set active style
                 if (idx + 1 === level) {
-                    btn.className = "tab-btn active px-4 py-2 rounded-lg bg-white dark:bg-slate-700 shadow-sm border border-blue-100 dark:border-slate-600 text-sm font-bold text-blue-600 whitespace-nowrap transition transform scale-105";
-                } else {
-                    btn.className = "tab-btn px-4 py-2 rounded-lg bg-white/50 dark:bg-slate-800/50 shadow-sm border border-transparent text-sm font-medium text-gray-500 whitespace-nowrap hover:bg-white dark:hover:bg-slate-700 transition";
+                    btn.className = "tab-btn active px-6 py-2.5 rounded-2xl bg-white dark:bg-slate-700 shadow-md border-2 border-pink-200 dark:border-slate-600 text-sm font-bold text-pink-500 whitespace-nowrap hover:bg-pink-50 transition transform hover:-translate-y-1";
                 }
             });
 
@@ -649,9 +710,9 @@
             ['list', 'flashcard', 'quiz'].forEach(m => {
                 const btn = document.getElementById(`btn-${m}`);
                 if (m === mode) {
-                    btn.className = "px-3 py-1.5 rounded-md bg-white dark:bg-slate-600 shadow text-blue-600 dark:text-blue-200 text-sm font-bold transition-all";
+                    btn.className = "px-4 py-2 rounded-xl bg-pink-100 dark:bg-pink-900 shadow-sm text-pink-600 dark:text-pink-200 text-sm font-bold transition-all";
                 } else {
-                    btn.className = "px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-blue-600 transition-all";
+                    btn.className = "px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 text-sm font-bold hover:text-pink-500 transition-all";
                 }
             });
 
@@ -689,34 +750,35 @@
             container.innerHTML = '';
 
             if (filteredVocab.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400">Không tìm thấy từ vựng nào.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400 font-bold italic">Không tìm thấy từ vựng nào 😢</div>`;
                 return;
             }
 
             filteredVocab.forEach(item => {
                 const isLearned = learnedWords.includes(item.hanzi);
                 const card = document.createElement('div');
-                card.className = `glass-card p-5 rounded-2xl relative ${isLearned ? 'border-green-200 bg-green-50/50' : ''}`;
+                // Cute list card style
+                card.className = `glass-card p-5 rounded-3xl relative transition hover:border-pink-300 ${isLearned ? 'border-green-200 bg-green-50/40' : 'border-white/50'}`;
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex flex-col">
-                            <h3 class="text-3xl font-bold text-blue-700 dark:text-blue-300 cn-font cursor-pointer hover:scale-110 transition-transform origin-left" onclick="playAudio('${item.hanzi}')">${item.hanzi}</h3>
-                            <span class="text-sm text-gray-500 font-mono">${item.pinyin}</span>
+                            <h3 class="text-3xl font-bold text-purple-600 dark:text-purple-300 cn-font cursor-pointer hover:scale-110 transition-transform origin-left drop-shadow-sm" onclick="playAudio('${item.hanzi}')">${item.hanzi}</h3>
+                            <span class="text-sm text-pink-400 font-mono font-bold">${item.pinyin}</span>
                         </div>
-                        <button onclick="playAudio('${item.hanzi}')" class="text-blue-300 hover:text-blue-500 transition"><i class="fas fa-volume-up"></i></button>
+                        <button onclick="playAudio('${item.hanzi}')" class="w-8 h-8 rounded-full bg-pink-50 text-pink-400 hover:bg-pink-100 hover:text-pink-600 flex items-center justify-center transition shadow-sm"><i class="fas fa-volume-up text-xs"></i></button>
                     </div>
-                    <div class="mb-3">
-                        <p class="font-bold text-slate-700 dark:text-slate-200">${item.meaning}</p>
+                    <div class="mb-3 border-b border-dashed border-pink-100 pb-2">
+                        <p class="font-bold text-slate-700 dark:text-slate-200 text-lg">${item.meaning}</p>
                     </div>
-                    <div class="text-sm bg-white/50 dark:bg-slate-700/50 p-2 rounded-lg border border-blue-50 dark:border-slate-600">
-                        <div class="flex justify-between">
-                            <p class="cn-font text-blue-900 dark:text-blue-100">${item.example}</p>
-                            <button onclick="playAudio('${item.example}')" class="ml-2 text-xs text-blue-400"><i class="fas fa-play"></i></button>
+                    <div class="text-sm bg-white/40 dark:bg-slate-700/40 p-3 rounded-xl border border-white/60 dark:border-slate-600">
+                        <div class="flex justify-between items-center mb-1">
+                            <p class="cn-font text-purple-800 dark:text-purple-100 font-medium">${item.example}</p>
+                            <button onclick="playAudio('${item.example}')" class="ml-2 text-xs text-pink-400 hover:text-pink-600"><i class="fas fa-play"></i></button>
                         </div>
-                        <p class="text-gray-500 dark:text-gray-400 text-xs mt-1 italic">${item.example_meaning}</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-xs italic">${item.example_meaning}</p>
                     </div>
-                    <button onclick="toggleLearnedInList('${item.hanzi}')" class="absolute top-2 right-2 p-1 ${isLearned ? 'text-green-500' : 'text-gray-200 hover:text-gray-400'}">
-                        <i class="fas fa-check-circle"></i>
+                    <button onclick="toggleLearnedInList('${item.hanzi}')" class="absolute -top-2 -right-2 w-8 h-8 rounded-full shadow-md flex items-center justify-center transition hover:scale-110 ${isLearned ? 'bg-green-400 text-white' : 'bg-gray-100 text-gray-300 hover:bg-green-100 hover:text-green-400'}">
+                        <i class="fas fa-check"></i>
                     </button>
                 `;
                 container.appendChild(card);
@@ -739,11 +801,13 @@
             if (filteredVocab.length === 0) return;
             const item = filteredVocab[currentFlashcardIndex];
             
-            document.getElementById('flashcard-inner').style.transform = "rotateY(0deg)";
+            // Reset to front
+            const inner = document.getElementById('flashcard-inner');
+            inner.style.transform = "rotateY(0deg)";
 
             document.getElementById('fc-hanzi').innerText = item.hanzi;
-            document.getElementById('fc-front-pinyin').innerText = item.pinyin;
-            document.getElementById('fc-pinyin').innerText = item.pinyin;
+            document.getElementById('fc-front-pinyin').innerText = item.pinyin; // Pinyin ở mặt trước
+            document.getElementById('fc-pinyin').innerText = item.pinyin; // Pinyin ở mặt sau (ẩn nếu muốn)
             document.getElementById('fc-meaning').innerText = item.meaning;
             document.getElementById('fc-example').innerText = item.example;
             document.getElementById('fc-example-meaning').innerText = item.example_meaning;
@@ -778,6 +842,7 @@
                 learnedWords.push(item.hanzi);
                 localStorage.setItem('learnedWords', JSON.stringify(learnedWords));
                 updateProgressDisplay();
+                // Cute Alert maybe?
             }
             nextFlashcard();
         }
@@ -791,7 +856,7 @@
 
         function startQuiz(mode) {
             if (filteredVocab.length < 4) {
-                alert("Cần ít nhất 4 từ vựng để chơi!");
+                alert("Cần ít nhất 4 từ vựng để chơi nha!");
                 return;
             }
             gameMode = mode;
@@ -806,7 +871,7 @@
         function nextQuizQuestion() {
             document.getElementById('btn-next-quiz').classList.add('hidden');
             document.getElementById('quiz-feedback').innerText = "";
-            document.getElementById('quiz-feedback').className = "mt-4 font-bold text-lg min-h-[1.75rem]";
+            document.getElementById('quiz-feedback').className = "mt-6 font-bold text-xl min-h-[2rem] rounded-xl py-2 transition-all";
 
             const questionItem = filteredVocab[Math.floor(Math.random() * filteredVocab.length)];
             document.getElementById('quiz-question').innerText = questionItem.hanzi;
@@ -825,7 +890,8 @@
 
             options.forEach(opt => {
                 const btn = document.createElement('button');
-                btn.className = "w-full p-4 rounded-xl border-2 border-blue-100 dark:border-slate-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition font-semibold text-slate-700 dark:text-slate-200";
+                // Cute Quiz Button Style
+                btn.className = "w-full p-4 rounded-2xl border-2 border-white/60 bg-white/40 dark:bg-slate-700/40 dark:border-slate-600 hover:bg-pink-50 hover:border-pink-200 dark:hover:bg-slate-600 transition font-bold text-slate-700 dark:text-slate-200 shadow-sm text-lg";
                 btn.innerText = opt.meaning;
                 btn.onclick = () => checkAnswer(opt, questionItem, btn);
                 optionsContainer.appendChild(btn);
@@ -837,7 +903,11 @@
             for (let btn of allBtns) {
                 btn.disabled = true;
                 if (btn.innerText === correct.meaning) {
-                    btn.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+                    btn.classList.add('bg-green-100', 'border-green-400', 'text-green-700', 'ring-2', 'ring-green-200');
+                    // Add icon
+                    btn.innerHTML = `<i class="fas fa-check mr-2"></i> ${btn.innerText}`;
+                } else {
+                    btn.classList.add('opacity-50');
                 }
             }
 
@@ -847,23 +917,25 @@
                 // CORRECT
                 currentScore += 10;
                 document.getElementById('quiz-score').innerText = currentScore;
-                feedback.innerText = "Chính xác! 🎉";
-                feedback.classList.add('text-green-600');
-                playAudio("Đúng rồi"); // Có thể đổi thành âm thanh ngắn
+                feedback.innerText = "Chính xác! Giỏi quá! 🎉";
+                feedback.classList.add('text-green-600', 'bg-green-50');
+                playAudio("Đúng rồi");
                 
-                // Auto next if survival? Or manual? Let's keep manual for reading
                 document.getElementById('btn-next-quiz').classList.remove('hidden');
             } else {
                 // WRONG
-                btnElement.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
+                btnElement.classList.remove('opacity-50');
+                btnElement.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+                btnElement.innerHTML = `<i class="fas fa-times mr-2"></i> ${btnElement.innerText}`;
+                
                 document.getElementById('quiz-interface').classList.add('shake-anim');
                 setTimeout(() => document.getElementById('quiz-interface').classList.remove('shake-anim'), 500);
 
-                feedback.innerText = `Sai rồi. Đáp án là: ${correct.pinyin}`;
-                feedback.classList.add('text-red-600');
+                feedback.innerText = `Tiếc quá! Đáp án là: ${correct.pinyin}`;
+                feedback.classList.add('text-red-500', 'bg-red-50');
 
                 if (gameMode === 'survival') {
-                    setTimeout(endGame, 1500);
+                    setTimeout(endGame, 2000);
                 } else {
                     document.getElementById('btn-next-quiz').classList.remove('hidden');
                 }
@@ -891,7 +963,7 @@
             if (document.body.classList.contains('dark')) {
                 icon.className = 'fas fa-sun text-yellow-300';
             } else {
-                icon.className = 'fas fa-moon text-blue-600';
+                icon.className = 'fas fa-moon text-purple-500';
             }
         }
 
