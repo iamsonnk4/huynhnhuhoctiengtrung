@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gấu Bắc Cực Học Tiếng Trung</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Quicksand:wght@500;700&display=swap');
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --text-color: #1e3a8a;
+            --accent-color: #3b82f6;
+        }
+
+        .dark {
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(51, 65, 85, 0.6);
+            --text-color: #e2e8f0;
+            --accent-color: #60a5fa;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(to bottom, #dbeafe, #eff6ff); /* Ice Blue */
+            transition: background 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        body.dark {
+            background: linear-gradient(to bottom, #0f172a, #1e293b); /* Night Sky */
+        }
+
+        .cn-font {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        /* Snow Effect */
+        .snowflake {
+            color: #fff;
+            font-size: 1em;
+            font-family: Arial, sans-serif;
+            text-shadow: 0 0 5px #000;
+            position: fixed;
+            top: -10%;
+            z-index: 0;
+            user-select: none;
+            cursor: default;
+            animation-name: snowflakes-fall, snowflakes-shake;
+            animation-duration: 10s, 3s;
+            animation-timing-function: linear, ease-in-out;
+            animation-iteration-count: infinite, infinite;
+            animation-play-state: running, running;
+        }
+        
+        .dark .snowflake {
+            color: #e2e8f0;
+            opacity: 0.5;
+        }
+
+        @keyframes snowflakes-fall {
+            0% { top: -10%; }
+            100% { top: 100%; }
+        }
+        @keyframes snowflakes-shake {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(80px); }
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Bear Animation */
+        .bear-container {
+            animation: breathe 3s infinite ease-in-out;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Flip Card */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+
+        /* Quiz Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .shake-anim { animation: shake 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 transition-colors duration-300">
+
+    <!-- Snow Container -->
+    <div id="snow-container" class="pointer-events-none"></div>
+
+    <!-- Top Navigation -->
+    <nav class="sticky top-0 z-50 glass-card shadow-sm border-b-0 rounded-b-xl mx-2 mt-1">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-paw text-2xl text-blue-500"></i>
+                <h1 class="text-xl font-bold text-blue-700 dark:text-blue-300 hidden md:block">HuynhNhu</h1>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <!-- Search -->
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm..." 
+                           class="pl-9 pr-4 py-1.5 rounded-full bg-blue-50 dark:bg-slate-700 border-none focus:ring-2 focus:ring-blue-300 w-32 md:w-48 text-sm transition-all">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                </div>
+
+                <!-- Dark Mode Toggle -->
+                <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-blue-100 dark:hover:bg-slate-600 transition-colors">
+                    <i id="themeIcon" class="fas fa-moon text-blue-600 dark:text-yellow-300"></i>
+                </button>
+
+                <!-- Settings Toggle -->
+                <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-blue-100 dark:hover:bg-slate-600 transition-colors">
+                    <i class="fas fa-cog text-gray-500 dark:text-gray-300"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Audio Settings Panel (Hidden) -->
+        <div id="settingsPanel" class="hidden absolute right-4 top-16 w-64 glass-card p-4 rounded-xl shadow-xl z-50">
+            <h3 class="font-bold mb-2 dark:text-white">Cài đặt giọng đọc</h3>
+            <div class="mb-3">
+                <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1">Tốc độ đọc</label>
+                <input type="range" id="rateInput" min="0.5" max="1.5" step="0.1" value="1" class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span>Chậm</span>
+                    <span>Chuẩn</span>
+                    <span>Nhanh</span>
+                </div>
+            </div>
+            <div>
+                <label class="text-xs text-gray-500 dark:text-gray-400 block mb-1">Giọng đọc (nếu có)</label>
+                <select id="voiceSelect" class="w-full text-sm p-1 rounded border dark:bg-slate-700 dark:text-white dark:border-slate-600"></select>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header / Mascot Area -->
+    <header class="container mx-auto px-4 py-6 text-center relative z-10">
+        <div class="bear-container inline-block relative mb-4">
+            <!-- SVG Polar Bear -->
+            <svg width="120" height="120" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="100" r="90" fill="white" stroke="#E2E8F0" stroke-width="4"/>
+                <path d="M60 70C60 70 70 50 100 50C130 50 140 70 140 70" stroke="#CBD5E1" stroke-width="8" stroke-linecap="round"/>
+                <circle cx="75" cy="90" r="8" fill="#1E293B"/>
+                <circle cx="125" cy="90" r="8" fill="#1E293B"/>
+                <ellipse cx="100" cy="110" rx="12" ry="8" fill="#1E293B"/>
+                <path d="M100 118V130" stroke="#1E293B" stroke-width="3"/>
+                <path d="M90 130Q100 140 110 130" stroke="#1E293B" stroke-width="3" fill="none"/>
+                <circle cx="50" cy="60" r="15" fill="white" stroke="#E2E8F0" stroke-width="4"/>
+                <circle cx="150" cy="60" r="15" fill="white" stroke="#E2E8F0" stroke-width="4"/>
+                <path d="M85 100C85 100 70 105 70 115" stroke="#FFB6C1" stroke-width="3" opacity="0.6"/>
+                <path d="M115 100C115 100 130 105 130 115" stroke="#FFB6C1" stroke-width="3" opacity="0.6"/>
+            </svg>
+            <div class="absolute -bottom-2 -right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                <span id="progressCount">0</span>/1200
+            </div>
+        </div>
+        <h2 class="text-2xl md:text-3xl font-bold text-blue-800 dark:text-blue-200 mb-2">Cùng HuynhNhu Học Tiếng Trung</h2>
+        <p class="text-blue-600 dark:text-blue-300 text-sm">Chinh phục 1200 từ vựng HSK 1-4</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pb-20 relative z-10">
+        
+        <!-- Controls & Tabs -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <!-- Level Tabs -->
+            <div class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide" id="levelTabs">
+                <button onclick="setLevel(1)" class="tab-btn active px-4 py-2 rounded-lg bg-white dark:bg-slate-700 shadow-sm border border-blue-100 dark:border-slate-600 text-sm font-bold text-blue-600 whitespace-nowrap hover:bg-blue-50 transition">HSK 1 (150)</button>
+                <button onclick="setLevel(2)" class="tab-btn px-4 py-2 rounded-lg bg-white/50 dark:bg-slate-800/50 shadow-sm border border-transparent text-sm font-medium text-gray-500 whitespace-nowrap hover:bg-white transition">HSK 2 (150)</button>
+                <button onclick="setLevel(3)" class="tab-btn px-4 py-2 rounded-lg bg-white/50 dark:bg-slate-800/50 shadow-sm border border-transparent text-sm font-medium text-gray-500 whitespace-nowrap hover:bg-white transition">HSK 3 (150)</button>
+                <button onclick="setLevel(4)" class="tab-btn px-4 py-2 rounded-lg bg-white/50 dark:bg-slate-800/50 shadow-sm border border-transparent text-sm font-medium text-gray-500 whitespace-nowrap hover:bg-white transition">HSK 4 (600)</button>
+            </div>
+
+            <!-- Mode Switcher -->
+            <div class="flex bg-blue-100 dark:bg-slate-700 p-1 rounded-lg">
+                <button onclick="setMode('list')" id="btn-list" class="px-3 py-1.5 rounded-md bg-white dark:bg-slate-600 shadow text-blue-600 dark:text-blue-200 text-sm font-bold transition-all"><i class="fas fa-list mr-1"></i> List</button>
+                <button onclick="setMode('flashcard')" id="btn-flashcard" class="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-blue-600 transition-all"><i class="fas fa-clone mr-1"></i> Thẻ</button>
+                <button onclick="setMode('quiz')" id="btn-quiz" class="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-blue-600 transition-all"><i class="fas fa-gamepad mr-1"></i> Game</button>
+            </div>
+        </div>
+
+        <!-- VIEW: List Mode -->
+        <div id="view-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards generated via JS -->
+        </div>
+
+        <!-- VIEW: Flashcard Mode -->
+        <div id="view-flashcard" class="hidden flex flex-col items-center justify-center min-h-[400px]">
+            <div class="relative w-full max-w-md h-80 group cursor-pointer perspective-1000" onclick="flipCard(this)">
+                <div id="flashcard-inner" class="relative w-full h-full duration-500 transform-style-3d shadow-xl rounded-2xl">
+                    <!-- Front -->
+                    <div class="absolute w-full h-full bg-white dark:bg-slate-800 rounded-2xl flex flex-col items-center justify-center backface-hidden border-2 border-blue-100 dark:border-slate-600">
+                        <span class="text-xs font-bold text-blue-400 mb-2">HÁN TỰ</span>
+                        <h2 id="fc-hanzi" class="text-6xl font-bold text-slate-800 dark:text-white cn-font mb-2">...</h2>
+                        <p id="fc-front-pinyin" class="text-xl text-blue-500 font-medium mb-4">...</p>
+                        <button onclick="event.stopPropagation(); playAudio('fc-hanzi')" class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 flex items-center justify-center transition">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <p class="text-gray-400 text-sm mt-4 italic">(Chạm để lật)</p>
+                    </div>
+                    <!-- Back -->
+                    <div class="absolute w-full h-full bg-blue-50 dark:bg-slate-700 rounded-2xl flex flex-col items-center justify-center backface-hidden rotate-y-180 border-2 border-blue-200 dark:border-slate-500 p-6 text-center">
+                        <h3 id="fc-pinyin" class="text-2xl font-bold text-blue-600 mb-1">...</h3>
+                        <p id="fc-meaning" class="text-xl text-slate-700 dark:text-slate-200 font-semibold mb-4">...</p>
+                        <div class="bg-white/60 dark:bg-slate-800/60 p-3 rounded-lg w-full">
+                            <p id="fc-example" class="cn-font text-lg text-slate-800 dark:text-slate-300 mb-1">...</p>
+                            <p id="fc-example-meaning" class="text-sm text-gray-500 dark:text-gray-400">...</p>
+                        </div>
+                         <button onclick="event.stopPropagation(); playAudio('fc-example')" class="mt-2 text-blue-500 hover:text-blue-700">
+                            <i class="fas fa-volume-up"></i> Nghe câu
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mt-8">
+                <button onclick="prevFlashcard()" class="w-12 h-12 rounded-full bg-white dark:bg-slate-700 shadow-md text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-arrow-left"></i></button>
+                <button onclick="markLearned()" class="px-6 py-2 rounded-full bg-green-500 text-white font-bold shadow-md hover:bg-green-600 transition"><i class="fas fa-check mr-2"></i>Đã thuộc</button>
+                <button onclick="nextFlashcard()" class="w-12 h-12 rounded-full bg-white dark:bg-slate-700 shadow-md text-blue-600 hover:bg-blue-50 transition"><i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- VIEW: Quiz & Game Mode -->
+        <div id="view-quiz" class="hidden max-w-2xl mx-auto">
+            
+            <!-- Game Selection -->
+            <div id="game-selection" class="grid grid-cols-2 gap-4 mb-6">
+                <button onclick="startQuiz('practice')" class="glass-card p-6 rounded-xl text-center hover:bg-blue-50 transition">
+                    <i class="fas fa-graduation-cap text-4xl text-blue-500 mb-3"></i>
+                    <h3 class="font-bold text-lg">Luyện tập</h3>
+                    <p class="text-sm text-gray-500">Làm thoải mái, không áp lực</p>
+                </button>
+                <button onclick="startQuiz('survival')" class="glass-card p-6 rounded-xl text-center hover:bg-red-50 transition border-red-100">
+                    <i class="fas fa-fire text-4xl text-red-500 mb-3"></i>
+                    <h3 class="font-bold text-lg">Sinh tồn</h3>
+                    <p class="text-sm text-gray-500">Sai là dừng lại!</p>
+                </button>
+            </div>
+
+            <!-- Quiz Interface -->
+            <div id="quiz-interface" class="hidden glass-card p-8 rounded-2xl shadow-lg text-center relative">
+                <div class="absolute top-4 right-4 text-sm font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                    Score: <span id="quiz-score">0</span>
+                </div>
+
+                <div class="mb-6 mt-4">
+                    <span class="text-sm text-gray-500 uppercase tracking-widest">Từ vựng này nghĩa là gì?</span>
+                    <h2 id="quiz-question" class="text-5xl font-bold text-blue-800 dark:text-white cn-font mt-2 mb-6">...</h2>
+                    <button onclick="playAudio('quiz-question')" class="text-blue-400 hover:text-blue-600"><i class="fas fa-volume-up text-xl"></i></button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="quiz-options">
+                    <!-- Options injected here -->
+                </div>
+                
+                <p id="quiz-feedback" class="mt-4 font-bold text-lg min-h-[1.75rem]"></p>
+                
+                <div class="flex justify-center gap-4 mt-4">
+                    <button onclick="quitQuiz()" class="text-gray-400 hover:text-gray-600 underline">Thoát</button>
+                    <button onclick="nextQuizQuestion()" id="btn-next-quiz" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hidden">Câu tiếp theo</button>
+                </div>
+            </div>
+            
+            <!-- Game Over Screen -->
+            <div id="game-over" class="hidden glass-card p-8 rounded-2xl shadow-lg text-center">
+                <i class="fas fa-trophy text-6xl text-yellow-400 mb-4"></i>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Hoàn thành!</h2>
+                <p class="text-xl mb-6">Điểm số của bạn: <span id="final-score" class="font-bold text-blue-600">0</span></p>
+                <button onclick="resetQuizView()" class="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold shadow hover:bg-blue-700 transition">Chơi lại</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JS: Data & Logic -->
+    <script>
+        // --- COMPRESSED DATASET (Mảng để tiết kiệm dung lượng) ---
+        // Format: [Hanzi, Pinyin, Meaning, Example, ExampleMeaning]
+        // HSK 1: 150 words (Full)
+        const hsk1_data = [
+            ["爱","ài","Yêu, thích","我爱你","Anh yêu em"], ["八","bā","Số 8","八个人","8 người"], ["爸爸","bàba","Bố","我爸爸是医生","Bố tôi là bác sĩ"], 
+            ["杯子","bēizi","Cái cốc","这个杯子很漂亮","Cái cốc này rất đẹp"], ["北京","Běijīng","Bắc Kinh","我想去北京","Tôi muốn đi Bắc Kinh"], ["本","běn","Quyển (lượng từ)","一本书","Một quyển sách"], 
+            ["不客气","búkèqi","Đừng khách sáo","谢谢！—不客气","Cảm ơn! - Đừng khách sáo"], ["不","bù","Không","我不吃","Tôi không ăn"], ["菜","cài","Món ăn, rau","中国菜","Món ăn Trung Quốc"], 
+            ["茶","chá","Trà","请喝茶","Mời uống trà"], ["吃","chī","Ăn","吃米饭","Ăn cơm"], ["出租车","chūzūchē","Taxi","坐出租车","Ngồi xe taxi"], 
+            ["打电话","dǎ diànhuà","Gọi điện thoại","我在打电话","Tôi đang gọi điện thoại"], ["大","dà","To, lớn","这个苹果很大","Quả táo này rất to"], ["的","de","Của","我的书","Sách của tôi"], 
+            ["点","diǎn","Giờ","五点","5 giờ"], ["电脑","diànnǎo","Máy tính","买电脑","Mua máy tính"], ["电视","diànshì","Tivi","看电视","Xem tivi"], 
+            ["电影","diànyǐng","Phim","看电影","Xem phim"], ["东西","dōngxi","Đồ vật","买东西","Mua đồ"], ["都","dōu","Đều","我们要去","Chúng tôi đều muốn đi"], 
+            ["读","dú","Đọc","读书","Đọc sách"], ["对不起","duìbuqǐ","Xin lỗi","对不起，我迟到了","Xin lỗi, tôi đến muộn"], ["多","duō","Nhiều","很多人","Rất nhiều người"], 
+            ["多少","duōshao","Bao nhiêu","多少钱？","Bao nhiêu tiền?"], ["儿子","érzi","Con trai","我的儿子","Con trai tôi"], ["二","èr","Số 2","二月","Tháng 2"], 
+            ["饭馆","fànguǎn","Nhà hàng","去饭馆吃","Đi nhà hàng ăn"], ["飞机","fēijī","Máy bay","坐飞机","Ngồi máy bay"], ["分钟","fēnzhōng","Phút","五分钟","5 phút"], 
+            ["高兴","gāoxìng","Vui vẻ","很高兴","Rất vui"], ["个","gè","Cái/Con","一个人","Một người"], ["工作","gōngzuò","Công việc","工作很忙","Công việc rất bận"], 
+            ["狗","gǒu","Chó","一只狗","Một con chó"], ["汉语","Hànyǔ","Tiếng Trung","学汉语","Học tiếng Trung"], ["好","hǎo","Tốt","你好","Chào bạn"], 
+            ["号","hào","Ngày/Số","五号","Ngày 5"], ["喝","hē","Uống","喝水","Uống nước"], ["和","hé","Và","我和你","Tôi và bạn"], 
+            ["很","hěn","Rất","很好","Rất tốt"], ["后面","hòumian","Phía sau","他在后面","Anh ấy ở phía sau"], ["回","huí","Về","回家","Về nhà"], 
+            ["会","huì","Biết/Sẽ","我会说汉语","Tôi biết nói tiếng Trung"], ["几","jǐ","Mấy","几个人？","Mấy người?"], ["家","jiā","Nhà","我的家","Nhà tôi"], 
+            ["叫","jiào","Tên là/Gọi","我叫小明","Tôi tên là Tiểu Minh"], ["今天","jīntiān","Hôm nay","今天是星期一","Hôm nay là thứ hai"], ["九","jiǔ","Số 9","九点","9 giờ"], 
+            ["开","kāi","Mở/Lái","开车","Lái xe"], ["看","kàn","Nhìn/Xem","看书","Đọc sách"], ["看见","kànjiàn","Nhìn thấy","我看见他了","Tôi nhìn thấy anh ấy rồi"], 
+            ["块","kuài","Đồng (tệ)","一块钱","Một tệ"], ["来","lái","Đến","他来了","Anh ấy đến rồi"], ["老师","lǎoshī","Giáo viên","王老师","Thầy Vương"], 
+            ["了","le","Rồi","下雨了","Mưa rồi"], ["冷","lěng","Lạnh","天气很冷","Thời tiết rất lạnh"], ["里","lǐ","Trong","家里","Trong nhà"], 
+            ["零","líng","Số 0","二零二零年","Năm 2020"], ["六","liù","Số 6","六个","6 cái"], ["妈妈","māma","Mẹ","我爱妈妈","Tôi yêu mẹ"], 
+            ["吗","ma","Không?","你好吗？","Bạn khỏe không?"], ["买","mǎi","Mua","买苹果","Mua táo"], ["猫","māo","Mèo","我的猫","Mèo của tôi"], 
+            ["没关系","méi guānxi","Không sao","对不起—没关系","Xin lỗi - Không sao"], ["没有","méiyǒu","Không có","我没有钱","Tôi không có tiền"], ["米饭","mǐfàn","Cơm","吃米饭","Ăn cơm"], 
+            ["明天","míngtiān","Ngày mai","明天见","Mai gặp lại"], ["名字","míngzi","Tên","你的名字","Tên của bạn"], ["哪","nǎ","Nào","哪本书？","Quyển sách nào?"], 
+            ["哪儿","nǎr","Ở đâu","你去哪儿？","Bạn đi đâu?"], ["那","nà","Kia/Đó","那个人","Người kia"], ["呢","ne","Thế/Nhé","你呢？","Còn bạn thì sao?"], 
+            ["能","néng","Có thể","我能坐这儿吗？","Tôi có thể ngồi đây không?"], ["你","nǐ","Bạn","你好","Chào bạn"], ["年","nián","Năm","一年","Một năm"], 
+            ["女儿","nǚ’ér","Con gái","他的女儿","Con gái ông ấy"], ["朋友","péngyou","Bạn bè","好朋友","Bạn tốt"], ["漂亮","piàoliang","Xinh đẹp","衣服很漂亮","Quần áo rất đẹp"], 
+            ["苹果","píngguǒ","Quả táo","吃苹果","Ăn táo"], ["七","qī","Số 7","七天","7 ngày"], ["钱","qián","Tiền","多少钱","Bao nhiêu tiền"], 
+            ["前面","qiánmian","Phía trước","在前面","Ở phía trước"], ["请","qǐng","Mời/Xin","请坐","Mời ngồi"], ["去","qù","Đi","去学校","Đi đến trường"], 
+            ["热","rè","Nóng","很热","Rất nóng"], ["人","rén","Người","中国人","Người Trung Quốc"], ["认识","rènshi","Quen biết","认识你很高兴","Rất vui được làm quen"], 
+            ["三","sān","Số 3","三点","3 giờ"], ["商店","shāngdiàn","Cửa hàng","去商店","Đi cửa hàng"], ["上","shàng","Trên/Lên","上车","Lên xe"], 
+            ["上午","shàngwǔ","Buổi sáng","明天上午","Sáng mai"], ["少","shǎo","Ít","很少","Rất ít"], ["谁","shéi","Ai","他是谁？","Anh ấy là ai?"], 
+            ["什么","shénme","Cái gì","什么名字","Tên gì"], ["十","shí","Số 10","十个人","10 người"], ["时候","shíhou","Lúc/Khi","什么时候","Khi nào"], 
+            ["是","shì","Là","我是学生","Tôi là học sinh"], ["书","shū","Sách","看书","Đọc sách"], ["水","shuǐ","Nước","喝水","Uống nước"], 
+            ["水果","shuǐguǒ","Hoa quả","买水果","Mua hoa quả"], ["睡觉","shuìjiào","Ngủ","去睡觉","Đi ngủ"], ["说","shuō","Nói","说话","Nói chuyện"], 
+            ["四","sì","Số 4","四个","4 cái"], ["岁","suì","Tuổi","五岁","5 tuổi"], ["他","tā","Anh ấy","他是老师","Anh ấy là giáo viên"], 
+            ["她","tā","Cô ấy","她是医生","Cô ấy là bác sĩ"], ["太","tài","Quá/Lắm","太好了","Tốt quá rồi"], ["天气","tiānqì","Thời tiết","天气很好","Thời tiết rất đẹp"], 
+            ["听","tīng","Nghe","听音乐","Nghe nhạc"], ["同学","tóngxué","Bạn học","老同学","Bạn học cũ"], ["喂","wèi","A lô","喂，你好","A lô, xin chào"], 
+            ["我","wǒ","Tôi","我是人","Tôi là người"], ["我们","wǒmen","Chúng tôi","我们要走了","Chúng tôi sắp đi rồi"], ["五","wǔ","Số 5","五个月","5 tháng"], 
+            ["喜欢","xǐhuan","Thích","喜欢你","Thích bạn"], ["下","xià","Dưới/Xuống","下雨","Mưa"], ["下午","xiàwǔ","Buổi chiều","今天下午","Chiều nay"], 
+            ["下雨","xiàyǔ","Mưa","正在下雨","Đang mưa"], ["先生","xiānsheng","Ngài/Ông","王先生","Ông Vương"], ["现在","xiànzài","Bây giờ","现在几点","Bây giờ mấy giờ"], 
+            ["想","xiǎng","Muốn/Nghĩ","我想去","Tôi muốn đi"], ["小","xiǎo","Nhỏ","小狗","Chó nhỏ"], ["小姐","xiǎojiě","Cô/Tiểu thư","李小姐","Cô Lý"], 
+            ["些","xiē","Vài","这些","Những cái này"], ["写","xiě","Viết","写字","Viết chữ"], ["谢谢","xièxie","Cảm ơn","谢谢你","Cảm ơn bạn"], 
+            ["星期","xīngqī","Tuần/Thứ","星期日","Chủ nhật"], ["学生","xuésheng","Học sinh","我是学生","Tôi là học sinh"], ["学习","xuéxí","Học tập","学习汉语","Học tiếng Trung"], 
+            ["学校","xuéxiào","Trường học","去学校","Đến trường"], ["一","yī","Số 1","一个","Một cái"], ["衣服","yīfu","Quần áo","穿衣服","Mặc quần áo"], 
+            ["医生","yīshēng","Bác sĩ","看医生","Đi khám bác sĩ"], ["医院","yīyuàn","Bệnh viện","在医院","Ở bệnh viện"], ["椅子","yǐzi","Ghế","坐在椅子上","Ngồi trên ghế"], 
+            ["有","yǒu","Có","我有一本书","Tôi có một quyển sách"], ["月","yuè","Tháng","一月","Tháng 1"], ["再见","zàijiàn","Tạm biệt","老师再见","Chào thầy (khi về)"], 
+            ["在","zài","Ở/Đang","在家","Ở nhà"], ["怎么","zěnme","Thế nào","怎么走","Đi thế nào"], ["怎么样","zěnmeyàng","Ra sao","天气怎么样","Thời tiết thế nào"], 
+            ["这","zhè","Đây","这是什么","Đây là cái gì"], ["中国","Zhōngguó","Trung Quốc","在中国","Ở Trung Quốc"], ["中午","zhōngwǔ","Buổi trưa","中午好","Chào buổi trưa"], 
+            ["住","zhù","Sống/Ở","住在北京","Sống ở Bắc Kinh"], ["桌子","zhuōzi","Bàn","在桌子上","Ở trên bàn"], ["字","zì","Chữ","汉字","Chữ Hán"], 
+            ["昨天","zuótiān","Hôm qua","昨天上午","Sáng hôm qua"], ["坐","zuò","Ngồi","请坐","Mời ngồi"], ["做","zuò","Làm","做饭","Nấu cơm"]
+        ];
+
+        // HSK 2: 150 Words (Full)
+        const hsk2_data = [
+            ["吧","ba","Nhé/Nha","走吧","Đi thôi"], ["白","bái","Trắng","白色的","Màu trắng"], ["百","bǎi","Trăm","一百","100"], 
+            ["帮助","bāngzhù","Giúp đỡ","需要帮助吗","Cần giúp không?"], ["报纸","bàozhǐ","Báo","看报纸","Đọc báo"], ["比","bǐ","So với","比我高","Cao hơn tôi"], 
+            ["别","bié","Đừng","别说话","Đừng nói chuyện"], ["长","cháng","Dài","很长","Rất dài"], ["唱歌","chànggē","Hát","喜欢唱歌","Thích hát"], 
+            ["出","chū","Ra","出来","Ra đây"], ["穿","chuān","Mặc","穿衣服","Mặc quần áo"], ["次","cì","Lần","一次","Một lần"], 
+            ["从","cóng","Từ","从这儿","Từ đây"], ["错","cuò","Sai","没错","Không sai"], ["打篮球","dǎ lánqiú","Chơi bóng rổ","去打篮球","Đi chơi bóng rổ"], 
+            ["大家","dàjiā","Mọi người","大家好","Chào mọi người"], ["到","dào","Đến","到了","Đến rồi"], ["得","de","(Trợ từ)","跑得快","Chạy nhanh"], 
+            ["等","děng","Đợi","等一下","Đợi chút"], ["弟弟","dìdi","Em trai","我的弟弟","Em trai tôi"], ["第一","dì-yī","Thứ nhất","第一名","Hạng nhất"], 
+            ["懂","dǒng","Hiểu","听懂了","Nghe hiểu rồi"], ["对","duì","Đúng/Đối với","你说的对","Bạn nói đúng"], ["对","duì","Đối với","对他很好","Rất tốt với anh ấy"],
+            ["房间","fángjiān","Phòng","大房间","Phòng lớn"], ["非常","fēicháng","Vô cùng","非常好","Vô cùng tốt"], ["服务员","fúwùyuán","Phục vụ","叫服务员","Gọi phục vụ"], 
+            ["高","gāo","Cao","很高","Rất cao"], ["告诉","gàosu","Nói với/Bảo","告诉你","Nói cho bạn"], ["哥哥","gēge","Anh trai","大哥哥","Anh trai lớn"], 
+            ["给","gěi","Cho","给你","Cho bạn"], ["公共汽车","gōnggòng qìchē","Xe buýt","坐公共汽车","Đi xe buýt"], ["公司","gōngsī","Công ty","大公司","Công ty lớn"], 
+            ["贵","guì","Đắt","太贵了","Đắt quá"], ["过","guo","Qua","去过","Đã từng đi"], ["还","hái","Vẫn/Còn","还有吗","Còn không?"], 
+            ["孩子","háizi","Trẻ con","小孩子","Đứa trẻ nhỏ"], ["好吃","hǎochī","Ngon","很好吃","Rất ngon"], ["黑","hēi","Đen","黑色的","Màu đen"], 
+            ["红","hóng","Đỏ","红色的","Màu đỏ"], ["火车站","huǒchēzhàn","Ga tàu","去火车站","Đi ga tàu"], ["机场","jīchǎng","Sân bay","去机场","Đi sân bay"], 
+            ["鸡蛋","jīdàn","Trứng gà","吃鸡蛋","Ăn trứng gà"], ["件","jiàn","Chiếc (quần áo)","一件衣服","Một chiếc áo"], ["教室","jiàoshì","Lớp học","在教室","Trong lớp"], 
+            ["姐姐","jiějie","Chị gái","大姐姐","Chị gái lớn"], ["介绍","jièshào","Giới thiệu","自我介绍","Tự giới thiệu"], ["进","jìn","Vào","请进","Mời vào"], 
+            ["近","jìn","Gần","很近","Rất gần"], ["就","jiù","Thì/Ngay","就是他","Chính là anh ta"], ["觉得","juéde","Cảm thấy","我觉得","Tôi cảm thấy"], 
+            ["咖啡","kāfēi","Cà phê","喝咖啡","Uống cà phê"], ["开始","kāishǐ","Bắt đầu","开始上课","Bắt đầu học"], ["考试","kǎoshì","Thi","明天考试","Mai thi"], 
+            ["可能","kěnéng","Có thể","可能下雨","Có thể mưa"], ["可以","kěyǐ","Có thể","可以吗","Được không?"], ["课","kè","Bài học","上课","Lên lớp"], 
+            ["快","kuài","Nhanh","很快","Rất nhanh"], ["快乐","kuàilè","Vui vẻ","新年快乐","Năm mới vui vẻ"], ["累","lèi","Mệt","很累","Rất mệt"], 
+            ["离","lí","Cách","离这儿","Cách đây"], ["两","liǎng","Hai","两个","2 cái"], ["路","lù","Đường","在路上","Trên đường"], 
+            ["旅游","lǚyóu","Du lịch","去旅游","Đi du lịch"], ["卖","mài","Bán","卖东西","Bán đồ"], ["慢","màn","Chậm","慢一点","Chậm một chút"], 
+            ["忙","máng","Bận","很忙","Rất bận"], ["每","měi","Mỗi","每个人","Mỗi người"], ["妹妹","mèimei","Em gái","小妹妹","Em gái nhỏ"], 
+            ["门","mén","Cửa","开门","Mở cửa"], ["面条","miàntiáo","Mì","吃面条","Ăn mì"], ["男","nán","Nam","男生","Nam sinh"], 
+            ["您","nín","Ngài","您好","Chào ngài"], ["牛奶","niúnǎi","Sữa","喝牛奶","Uống sữa"], ["女","nǚ","Nữ","女生","Nữ sinh"], 
+            ["旁边","pángbiān","Bên cạnh","在旁边","Ở bên cạnh"], ["跑步","pǎobù","Chạy bộ","去跑步","Đi chạy bộ"], ["便宜","piányi","Rẻ","很便宜","Rất rẻ"], 
+            ["票","piào","Vé","买票","Mua vé"], ["妻子","qīzi","Vợ","他的妻子","Vợ anh ấy"], ["起床","qǐchuáng","Thức dậy","早上起床","Sáng thức dậy"], 
+            ["千","qiān","Nghìn","一千","Một nghìn"], ["铅笔","qiānbǐ","Bút chì","一支铅笔","Một cái bút chì"], ["晴","qíng","Nắng","晴天","Trời nắng"], 
+            ["去年","qùnián","Năm ngoái","去年这个时候","Lúc này năm ngoái"], ["让","ràng","Nhường/Bảo","让我看看","Để tôi xem"], ["日","rì","Ngày","一月一日","Ngày 1 tháng 1"], 
+            ["上班","shàngbān","Đi làm","去上班","Đi làm"], ["身体","shēntǐ","Sức khỏe","身体健康","Sức khỏe tốt"], ["生病","shēngbìng","Ốm","他生病了","Anh ấy ốm rồi"], 
+            ["生日","shēngrì","Sinh nhật","生日快乐","Sinh nhật vui vẻ"], ["时间","shíjiān","Thời gian","没时间","Không có thời gian"], ["事情","shìqing","Sự việc","什么事情","Việc gì"], 
+            ["手表","shǒubiǎo","Đồng hồ","新手表","Đồng hồ mới"], ["手机","shǒujī","Điện thoại","玩手机","Chơi điện thoại"], ["送","sòng","Tặng","送礼物","Tặng quà"], 
+            ["虽然…但是…","suīrán…dànshì","Tuy...nhưng","虽然累但是高兴","Tuy mệt nhưng vui"], ["它","tā","Nó","它是猫","Nó là mèo"], ["踢足球","tī zúqiú","Đá bóng","喜欢踢足球","Thích đá bóng"], 
+            ["题","tí","Đề bài","这个问题","Vấn đề này"], ["跳舞","tiàowǔ","Nhảy","会跳舞","Biết nhảy"], ["外","wài","Ngoài","外面","Bên ngoài"], 
+            ["完","wán","Xong","做完了","Làm xong rồi"], ["玩","wán","Chơi","去玩","Đi chơi"], ["晚上","wǎnshang","Buổi tối","今天晚上","Tối nay"], 
+            ["为什么","wèishénme","Tại sao","为什么不去","Tại sao không đi"], ["问","wèn","Hỏi","问老师","Hỏi giáo viên"], ["问题","wèntí","Vấn đề","没问题","Không vấn đề"], 
+            ["西瓜","xīguā","Dưa hấu","吃西瓜","Ăn dưa hấu"], ["希望","xīwàng","Hy vọng","希望能赢","Hy vọng thắng"], ["洗","xǐ","Rửa","洗手","Rửa tay"], 
+            ["小时","xiǎoshí","Giờ","一个小时","Một tiếng"], ["笑","xiào","Cười","大笑","Cười lớn"], ["新","xīn","Mới","新年","Năm mới"], 
+            ["姓","xìng","Họ","我姓阮","Tôi họ Nguyễn"], ["休息","xiūxi","Nghỉ ngơi","休息一下","Nghỉ một chút"], ["雪","xuě","Tuyết","下雪","Tuyết rơi"], 
+            ["颜色","yánsè","Màu sắc","什么颜色","Màu gì"], ["眼睛","yǎnjing","Mắt","大眼睛","Mắt to"], ["羊肉","yángròu","Thịt cừu/dê","吃羊肉","Ăn thịt cừu"], 
+            ["药","yào","Thuốc","吃药","Uống thuốc"], ["要","yào","Muốn/Phải","我要去","Tôi phải đi"], ["也","yě","Cũng","我也是","Tôi cũng vậy"], 
+            ["一起","yìqǐ","Cùng nhau","在一起","Ở cùng nhau"], ["一下","yíxià","Một chút","看一下","Xem một chút"], ["已经","yǐjīng","Đã","已经走了","Đã đi rồi"], 
+            ["意思","yìsi","Ý nghĩa","什么意思","Ý gì?"], ["因为…所以…","yīnwèi…suǒyǐ","Bởi vì...nên","因为忙所以没去","Vì bận nên không đi"], ["阴","yīn","Râm/Âm u","阴天","Trời âm u"], 
+            ["游泳","yóuyǒng","Bơi","去游泳","Đi bơi"], ["右边","yòubian","Bên phải","在右边","Ở bên phải"], ["鱼","yú","Cá","吃鱼","Ăn cá"], 
+            ["远","yuǎn","Xa","很远","Rất xa"], ["运动","yùndòng","Thể thao","做运动","Tập thể thao"], ["再","zài","Lại","再见","Tạm biệt"], 
+            ["早上","zǎoshang","Buổi sáng","早上好","Chào buổi sáng"], ["丈夫","zhàngfu","Chồng","我的丈夫","Chồng tôi"], ["找","zhǎo","Tìm","找东西","Tìm đồ"], 
+            ["着","zhe","(Đang)","看着书","Đang đọc sách"], ["真","zhēn","Thật","真好","Thật tốt"], ["正在","zhèngzài","Đang","正在做","Đang làm"], 
+            ["知道","zhīdao","Biết","我知道","Tôi biết"], ["准备","zhǔnbèi","Chuẩn bị","准备好了","Chuẩn bị xong"], ["自行车","zìxíngchē","Xe đạp","骑自行车","Đi xe đạp"], 
+            ["走","zǒu","Đi","走路","Đi bộ"], ["最","zuì","Nhất","最好","Tốt nhất"], ["左边","zuǒbian","Bên trái","在左边","Ở bên trái"]
+        ];
+
+        // HSK 3: Samples (Compact for demo, large set)
+        const hsk3_data = [
+            ["阿姨","āyí","Dì/Cô","阿姨好","Chào dì"], ["矮","ǎi","Thấp","个子矮","Dáng thấp"], ["安静","ānjìng","Yên tĩnh","很安静","Rất yên tĩnh"], 
+            ["把","bǎ","(Giới từ)","把门关上","Đóng cửa lại"], ["搬","bān","Chuyển","搬家","Chuyển nhà"], ["班","bān","Lớp","上班","Đi làm"], 
+            ["办法","bànfǎ","Biện pháp","没办法","Hết cách"], ["半","bàn","Một nửa","半天","Nửa ngày"], ["办公室","bàngōngshì","Văn phòng","去办公室","Đến văn phòng"], 
+            ["帮忙","bāngmáng","Giúp đỡ","请帮忙","Xin giúp đỡ"], ["包","bāo","Túi","书包","Cặp sách"], ["饱","bǎo","No","吃饱了","Ăn no rồi"], 
+            ["北方","běifāng","Miền Bắc","北方人","Người miền Bắc"], ["被","bèi","Bị/Được","被打了","Bị đánh"], ["鼻子","bízi","Mũi","大鼻子","Mũi to"], 
+            ["比较","bǐjiào","Khá/So với","比较好","Khá tốt"], ["比赛","bǐsài","Thi đấu","足球比赛","Trận bóng đá"], ["必须","bìxū","Phải","必须去","Phải đi"], 
+            ["变化","biànhuà","Thay đổi","变化很大","Thay đổi rất lớn"], ["表示","biǎoshì","Biểu thị","表示感谢","Biểu thị cảm ơn"], ["表演","biǎoyǎn","Biểu diễn","精彩的表演","Màn biểu diễn đặc sắc"], 
+            ["别人","biéren","Người khác","问别人","Hỏi người khác"], ["宾馆","bīnguǎn","Khách sạn","住宾馆","Ở khách sạn"], ["冰箱","bīngxiāng","Tủ lạnh","在冰箱里","Trong tủ lạnh"], 
+            ["才","cái","Mới","刚才","Vừa nãy"], ["菜单","càidān","Thực đơn","看菜单","Xem thực đơn"], ["参加","cānjiā","Tham gia","参加会议","Tham gia họp"], 
+            ["草","cǎo","Cỏ","绿草","Cỏ xanh"], ["层","céng","Tầng","三层","Tầng 3"], ["差","chà","Kém/Thiếu","差不多","Gần như/Kém không nhiều"], 
+            ["长","zhǎng","Lớn lên","长大了","Lớn rồi"], ["超市","chāoshì","Siêu thị","逛超市","Dạo siêu thị"], ["衬衫","chènshān","Sơ mi","白衬衫","Sơ mi trắng"], 
+            ["成绩","chéngjì","Thành tích","好成绩","Thành tích tốt"], ["城市","chéngshì","Thành phố","大城市","Thành phố lớn"], ["迟到","chídào","Đến muộn","别迟到","Đừng đến muộn"], 
+            ["出现","chūxiàn","Xuất hiện","突然出现","Đột nhiên xuất hiện"], ["厨房","chúfáng","Bếp","在厨房","Trong bếp"], ["除了","chúle","Ngoài ra","除了他","Ngoài anh ấy ra"], 
+            ["春","chūn","Xuân","春天","Mùa xuân"], ["词语","cíyǔ","Từ ngữ","新词语","Từ ngữ mới"], ["聪明","cōngming","Thông minh","很聪明","Rất thông minh"], 
+            ["打扫","dǎsǎo","Quét dọn","打扫房间","Dọn phòng"], ["打算","dǎsuàn","Dự định","有什么打算","Có dự định gì"], ["带","dài","Mang/Đem","带钱","Mang tiền"], 
+            ["担心","dānxīn","Lo lắng","别担心","Đừng lo lắng"], ["蛋糕","dàngāo","Bánh kem","吃蛋糕","Ăn bánh kem"], ["当然","dāngrán","Đương nhiên","当然可以","Đương nhiên được"], 
+            ["灯","dēng","Đèn","开灯","Bật đèn"], ["地","de","(Trợ từ)","高兴地说","Nói một cách vui vẻ"], ["地方","dìfang","Địa phương","什么地方","Chỗ nào"], 
+            ["地铁","dìtiě","Tàu điện ngầm","坐地铁","Đi tàu điện ngầm"], ["地图","dìtú","Bản đồ","看地图","Xem bản đồ"], ["电梯","diàntī","Thang máy","坐电梯","Đi thang máy"], 
+            ["电子邮件","diànzǐyóujiàn","Email","发邮件","Gửi mail"], ["东","dōng","Đông","东方","Phương Đông"], ["冬","dōng","Đông","冬天","Mùa đông"], 
+            ["动物","dòngwù","Động vật","小动物","Động vật nhỏ"], ["短","duǎn","Ngắn","很短","Rất ngắn"], ["段","duàn","Đoạn","一段时间","Một khoảng thời gian"], 
+            ["锻炼","duànliàn","Rèn luyện","去锻炼","Đi rèn luyện"], ["多么","duōme","Bao nhiêu","多么好","Tốt biết bao"], ["饿","è","Đói","我很饿","Tôi rất đói"], 
+            ["耳朵","ěrduo","Tai","耳朵疼","Đau tai"], ["发","fā","Phát/Gửi","发短信","Gửi tin nhắn"], ["发烧","fāshāo","Sốt","他发烧了","Anh ấy sốt rồi"], 
+            ["发现","fāxiàn","Phát hiện","没发现","Không phát hiện"], ["方便","fāngbiàn","Thuận tiện","很方便","Rất thuận tiện"], ["放","fàng","Đặt/Để","放在桌上","Để trên bàn"], 
+            ["放心","fàngxīn","Yên tâm","请放心","Xin yên tâm"], ["分","fēn","Phút/Chia","十分","10 phút"], ["复习","fùxí","Ôn tập","复习课文","Ôn bài khóa"], 
+            ["附近","fùjìn","Gần đây","在这附近","Ở gần đây"], ["干净","gānjìng","Sạch sẽ","很干净","Rất sạch"], ["感冒","gǎnmào","Cảm cúm","得了感冒","Bị cảm cúm"], 
+            ["感兴趣","gǎn xìngqù","Hứng thú","对它感兴趣","Hứng thú với nó"], ["刚才","gāngcái","Vừa nãy","刚才去哪","Vừa nãy đi đâu"], ["个子","gèzi","Dáng vóc","个子高","Dáng cao"], 
+            ["根据","gēnjù","Căn cứ","根据规定","Căn cứ quy định"], ["跟","gēn","Với","跟我走","Đi với tôi"], ["更","gèng","Càng","更好","Tốt hơn"], 
+            ["公斤","gōngjīn","Cân (kg)","一公斤","1 kg"], ["公园","gōngyuán","Công viên","去公园","Đi công viên"], ["故事","gùshi","Câu chuyện","讲故事","Kể chuyện"], 
+            ["刮风","guāfēng","Gió thổi","今天刮风","Hôm nay có gió"], ["关","guān","Đóng","关灯","Tắt đèn"], ["关系","guānxi","Quan hệ","没关系","Không sao"], 
+            ["关心","guānxīn","Quan tâm","关心朋友","Quan tâm bạn bè"], ["关于","guānyú","Về","关于这个","Về cái này"], ["国家","guójiā","Quốc gia","哪个国家","Quốc gia nào"], 
+            ["过","guò","Qua","过生日","Đón sinh nhật"], ["过去","guòqù","Quá khứ","那是过去","Đó là quá khứ"], ["还是","háishì","Hay là","茶还是咖啡","Trà hay cà phê"], 
+            ["害怕","hàipà","Sợ","别害怕","Đừng sợ"], ["黑板","hēibǎn","Bảng đen","看黑板","Nhìn bảng đen"], ["后来","hòulái","Sau này","后来呢","Sau đó thì sao"], 
+            ["护照","hùzhào","Hộ chiếu","办护照","Làm hộ chiếu"], ["花","huā","Hoa/Tiêu","花钱","Tiêu tiền"], ["画","huà","Vẽ","画画","Vẽ tranh"], 
+            ["坏","huài","Hỏng/Xấu","坏人","Người xấu"], ["欢迎","huānyíng","Hoan nghênh","欢迎光临","Hoan nghênh quý khách"], ["环境","huánjìng","Môi trường","保护环境","Bảo vệ môi trường"], 
+            ["换","huàn","Đổi","换钱","Đổi tiền"], ["黄河","Huánghé","Hoàng Hà","黄河水","Nước sông Hoàng Hà"], ["回答","huídá","Trả lời","回答问题","Trả lời câu hỏi"], 
+            ["会议","huìyì","Hội nghị","开会","Họp"], ["或者","huòzhě","Hoặc","苹果或者梨","Táo hoặc lê"], ["几乎","jīhū","Hầu như","几乎忘了","Hầu như quên rồi"], 
+            ["机会","jīhuì","Cơ hội","好机会","Cơ hội tốt"], ["极","jí","Cực kỳ","好极了","Tốt cực kỳ"], ["记得","jìde","Nhớ","我不记得","Tôi không nhớ"]
+        ];
+
+        // HSK 4: Samples (Compact for demo, large set)
+        const hsk4_data = [
+            ["爱情","àiqíng","Tình yêu","爱情故事","Câu chuyện tình yêu"], ["安排","ānpái","Sắp xếp","安排时间","Sắp xếp thời gian"], ["安全","ānquán","An toàn","注意安全","Chú ý an toàn"], 
+            ["暗","àn","Tối","天暗了","Trời tối rồi"], ["按时","ànshí","Đúng giờ","按时完成","Hoàn thành đúng giờ"], ["按照","ànzhào","Theo như","按照规定","Theo quy định"], 
+            ["百分之","bǎifēnzhī","Phần trăm","百分之百","100%"], ["棒","bàng","Giỏi","真棒","Thật giỏi"], ["包子","bāozi","Bánh bao","吃包子","Ăn bánh bao"], 
+            ["保护","bǎohù","Bảo vệ","保护环境","Bảo vệ môi trường"], ["保证","bǎozhèng","Đảm bảo","向你保证","Đảm bảo với bạn"], ["报名","bàomíng","Báo danh","报名参加","Đăng ký tham gia"], 
+            ["抱","bào","Ôm","抱一下","Ôm một cái"], ["抱歉","bàoqiàn","Xin lỗi","很抱歉","Rất xin lỗi"], ["倍","bèi","Lần (gấp)","两倍","Gấp đôi"], 
+            ["本来","běnlái","Vốn dĩ","本来想去","Vốn dĩ muốn đi"], ["笨","bèn","Ngốc","太笨了","Ngốc quá"], ["比如","bǐrú","Ví dụ","比如我说","Ví dụ tôi nói"], 
+            ["毕业","bìyè","Tốt nghiệp","大学毕业","Tốt nghiệp đại học"], ["遍","biàn","Lần (lượt)","再说一遍","Nói lại lần nữa"], ["标准","biāozhǔn","Tiêu chuẩn","符合标准","Phù hợp tiêu chuẩn"], 
+            ["表格","biǎogé","Bảng biểu","填表格","Điền bảng biểu"], ["表示","biǎoshì","Biểu thị","表示同意","Biểu thị đồng ý"], ["表演","biǎoyǎn","Biểu diễn","看表演","Xem biểu diễn"], 
+            ["表扬","biǎoyáng","Biểu dương","受到表扬","Được biểu dương"], ["饼干","bǐnggān","Bánh quy","吃饼干","Ăn bánh quy"], ["并且","bìngqiě","Đồng thời","并且...","Đồng thời..."], 
+            ["博士","bóshì","Tiến sĩ","他是博士","Anh ấy là tiến sĩ"], ["不得不","bùdébù","Không thể không","不得不去","Không thể không đi"], ["不管","bùguǎn","Bất kể","不管是谁","Bất kể là ai"], 
+            ["不过","búguò","Nhưng","只不过","Chẳng qua chỉ là"], ["不仅","bùjǐn","Không những","不仅...而且...","Không những...mà còn"], ["部分","bùfen","Bộ phận","大部分","Đại bộ phận"], 
+            ["擦","cā","Lau","擦桌子","Lau bàn"], ["猜","cāi","Đoán","猜猜看","Đoán xem"], ["材料","cáiliào","Tài liệu","阅读材料","Tài liệu đọc"], 
+            ["参观","cānguān","Tham quan","参观学校","Tham quan trường"], ["餐厅","cāntīng","Nhà hàng","去餐厅","Đi nhà hàng"], ["厕所","cèsuǒ","Nhà vệ sinh","上厕所","Đi vệ sinh"], 
+            ["差不多","chàbuduō","Xấp xỉ","差不多好了","Sắp xong rồi"], ["长城","Chángchéng","Trường Thành","去长城","Đi Trường Thành"], ["长江","Chángjiāng","Trường Giang","长江水","Nước Trường Giang"], 
+            ["尝","cháng","Nếm","尝一下","Nếm một chút"], ["场","chǎng","Trận (lượng từ)","一场比赛","Một trận đấu"], ["超过","chāoguò","Vượt quá","超过时间","Vượt quá thời gian"], 
+            ["吵","chǎo","Ồn ào","太吵了","Ồn quá"], ["成功","chénggōng","Thành công","祝你成功","Chúc bạn thành công"], ["成熟","chéngshú","Trưởng thành","很成熟","Rất trưởng thành"], 
+            ["成为","chéngwéi","Trở thành","成为老师","Trở thành giáo viên"], ["诚实","chéngshí","Thành thực","诚实的人","Người thành thực"], ["乘坐","chéngzuò","Ngồi (xe)","乘坐飞机","Ngồi máy bay"], 
+            ["吃惊","chījīng","Kinh ngạc","很吃惊","Rất kinh ngạc"], ["重新","chóngxīn","Lại","重新开始","Bắt đầu lại"], ["抽烟","chōuyān","Hút thuốc","别抽烟","Đừng hút thuốc"], 
+            ["出差","chūchāi","Công tác","去出差","Đi công tác"], ["出发","chūfā","Xuất phát","准时出发","Xuất phát đúng giờ"], ["出生","chūshēng","Sinh ra","在哪出生","Sinh ra ở đâu"], 
+            ["厨房","chúfáng","Bếp","厨房里","Trong bếp"], ["传真","chuánzhēn","Fax","发传真","Gửi fax"], ["窗户","chuānghu","Cửa sổ","开窗户","Mở cửa sổ"], 
+            ["词典","cídiǎn","Từ điển","查词典","Tra từ điển"], ["从来","cónglái","Từ trước đến nay","从来没去过","Chưa từng đi bao giờ"], ["粗心","cūxīn","Qua loa","太粗心","Quá qua loa"], 
+            ["存","cún","Gửi","存钱","Gửi tiền"], ["错误","cuòwù","Sai lầm","犯错误","Phạm sai lầm"], ["答案","dá'àn","Đáp án","正确答案","Đáp án đúng"], 
+            ["打扮","dǎban","Trang điểm","爱打扮","Thích trang điểm"], ["打扰","dǎrǎo","Làm phiền","打扰了","Làm phiền rồi"], ["打印","dǎyìn","In","打印机","Máy in"], 
+            ["打折","dǎzhé","Giảm giá","打八折","Giảm 20%"], ["打针","dǎzhēn","Tiêm","去打针","Đi tiêm"], ["大概","dàgài","Đại khái","大概知道","Đại khái biết"], 
+            ["大使馆","dàshǐguǎn","Đại sứ quán","去大使馆","Đến đại sứ quán"], ["大约","dàyuē","Khoảng","大约多少","Khoảng bao nhiêu"], ["大夫","dàifu","Bác sĩ","看大夫","Khám bác sĩ"], 
+            ["戴","dài","Đeo/Đội","戴眼镜","Đeo kính"], ["当","dāng","Làm/Đương","当老师","Làm giáo viên"], ["当时","dāngshí","Lúc đó","当时我在","Lúc đó tôi ở"], 
+            ["刀","dāo","Dao","一把刀","Một con dao"], ["导游","dǎoyóu","Hướng dẫn viên","当导游","Làm hướng dẫn viên"], ["倒","dǎo","Đổ","倒水","Rót nước"], 
+            ["到处","dàochù","Khắp nơi","到处都是","Khắp nơi đều có"], ["到底","dàodǐ","Rốt cuộc","到底去不去","Rốt cuộc có đi không"], ["道歉","dàoqiàn","Xin lỗi","向他道歉","Xin lỗi anh ấy"], 
+            ["得意","déyì","Đắc ý","很得意","Rất đắc ý"], ["得","děi","Phải","得走了","Phải đi rồi"], ["登机牌","dēngjīpái","Thẻ lên máy bay","换登机牌","Đổi thẻ lên máy bay"], 
+            ["等","děng","Vân vân","等等","Vân vân"], ["低","dī","Thấp","水平低","Trình độ thấp"], ["底","dǐ","Đáy","年底","Cuối năm"], 
+            ["地点","dìdiǎn","Địa điểm","开会地点","Địa điểm họp"], ["地球","dìqiú","Trái đất","地球很大","Trái đất rất lớn"], ["地址","dìzhǐ","Địa chỉ","你的地址","Địa chỉ của bạn"], 
+            ["调查","diàochá","Điều tra","做调查","Làm điều tra"], ["掉","diào","Rơi","掉下来","Rơi xuống"], ["丢","diū","Mất","丢钱了","Mất tiền rồi"], 
+            ["动作","dòngzuò","Động tác","动作快","Động tác nhanh"], ["堵车","dǔchē","Tắc đường","现在堵车","Bây giờ tắc đường"], ["肚子","dùzi","Bụng","肚子疼","Đau bụng"], 
+            ["短信","duǎnxìn","Tin nhắn","发短信","Gửi tin nhắn"], ["对话","duìhuà","Đối thoại","练习对话","Luyện tập đối thoại"], ["对面","duìmiàn","Đối diện","在对面","Ở đối diện"], 
+            ["对于","duìyú","Đối với","对于这个问题","Đối với vấn đề này"], ["儿童","értóng","Nhi đồng","儿童节","Tết thiếu nhi"], ["而","ér","Mà","而且","Mà còn"], 
+            ["发生","fāshēng","Xảy ra","发生了什么","Đã xảy ra chuyện gì"], ["发展","fāzhǎn","Phát triển","快速发展","Phát triển nhanh"], ["法律","fǎlǜ","Pháp luật","学习法律","Học luật"], 
+            ["翻译","fānyì","Phiên dịch","当翻译","Làm phiên dịch"], ["烦恼","fánnǎo","Phiền não","没烦恼","Không phiền não"], ["反对","fǎnduì","Phản đối","我反对","Tôi phản đối"], 
+            ["方法","fāngfǎ","Phương pháp","好方法","Phương pháp tốt"], ["方面","fāngmiàn","Phương diện","这方面","Phương diện này"], ["方向","fāngxiàng","Phương hướng","方向不对","Phương hướng không đúng"], 
+            ["房东","fángdōng","Chủ nhà","问房东","Hỏi chủ nhà"], ["放弃","fàngqì","Từ bỏ","别放弃","Đừng từ bỏ"], ["放暑假","fàng shǔjià","Nghỉ hè","快放暑假了","Sắp nghỉ hè rồi"], 
+            ["放松","fàngsōng","Thư giãn","放松一下","Thư giãn một chút"], ["份","fèn","Phần","一份饭","Một suất cơm"], ["丰富","fēngfù","Phong phú","经验丰富","Kinh nghiệm phong phú"], 
+            ["否则","fǒuzé","Nếu không","快走，否则迟到了","Đi nhanh lên, nếu không sẽ muộn"], ["符合","fúhé","Phù hợp","符合要求","Phù hợp yêu cầu"], ["父亲","fùqīn","Cha","我的父亲","Cha tôi"], 
+            ["付款","fùkuǎn","Thanh toán","去付款","Đi thanh toán"], ["负责","fùzé","Phụ trách","我负责","Tôi phụ trách"], ["复印","fùyìn","Photo","复印文件","Photo tài liệu"], 
+            ["复杂","fùzá","Phức tạp","很复杂","Rất phức tạp"], ["富","fù","Giàu","富有","Giàu có"], ["改变","gǎibiàn","Thay đổi","改变主意","Thay đổi ý định"], 
+            ["干杯","gānbēi","Cạn ly","大家干杯","Mọi người cạn ly"], ["赶","gǎn","Đuổi/Vội","赶时间","Vội thời gian"], ["敢","gǎn","Dám","不敢","Không dám"], 
+            ["感动","gǎndòng","Cảm động","很感动","Rất cảm động"], ["感觉","gǎnjué","Cảm giác","什么感觉","Cảm giác gì"], ["感情","gǎnqíng","Tình cảm","感情深","Tình cảm sâu sắc"], 
+            ["感谢","gǎnxiè","Cảm tạ","非常感谢","Vô cùng cảm tạ"], ["干","gàn","Làm","干什么","Làm cái gì"], ["高级","gāojí","Cao cấp","高级酒店","Khách sạn cao cấp"], 
+            ["高速公路","gāosù gōnglù","Đường cao tốc","上高速公路","Lên đường cao tốc"], ["各","gè","Các","各位","Các vị"], ["工资","gōngzī","Lương","发工资","Phát lương"], 
+            ["公里","gōnglǐ","Km","一公里","1 km"], ["功夫","gōngfu","Kungfu","中国功夫","Kungfu Trung Quốc"], ["共同","gòngtóng","Chung","共同努力","Cùng nhau nỗ lực"], 
+            ["购物","gòuwù","Mua sắm","去购物","Đi mua sắm"], ["够","gòu","Đủ","够了","Đủ rồi"], ["估计","gūjì","Ước tính","我估计","Tôi ước tính"], 
+            ["孤单","gūdān","Cô đơn","很孤单","Rất cô đơn"], ["鼓励","gǔlì","Cổ vũ","互相鼓励","Cổ vũ lẫn nhau"], ["鼓掌","gǔzhǎng","Vỗ tay","大家鼓掌","Mọi người vỗ tay"], 
+            ["顾客","gùkè","Khách hàng","欢迎顾客","Chào đón khách hàng"], ["故意","gùyì","Cố ý","不是故意的","Không phải cố ý"], ["挂","guà","Treo","挂在墙上","Treo trên tường"], 
+            ["关键","guānjiàn","Then chốt","关键时刻","Thời khắc then chốt"], ["观众","guānzhòng","Khán giả","很多观众","Rất nhiều khán giả"], ["管理","guǎnlǐ","Quản lý","管理公司","Quản lý công ty"], 
+            ["光","guāng","Sáng/Chỉ","光亮","Sáng sủa"], ["广播","guǎngbō","Phát thanh","听广播","Nghe phát thanh"], ["广告","guǎnggào","Quảng cáo","看广告","Xem quảng cáo"], 
+            ["逛","guàng","Dạo","逛街","Dạo phố"], ["规定","guīdìng","Quy định","新规定","Quy định mới"], ["国籍","guójí","Quốc tịch","什么国籍","Quốc tịch gì"], 
+            ["国际","guójì","Quốc tế","国际关系","Quan hệ quốc tế"], ["果汁","guǒzhī","Nước ép","喝果汁","Uống nước ép"], ["过程","guòchéng","Quá trình","在这个过程中","Trong quá trình này"], 
+            ["海洋","hǎiyáng","Đại dương","蓝色的海洋","Đại dương xanh"], ["害羞","hàixiū","Xấu hổ","很害羞","Rất xấu hổ"], ["寒假","hánjià","Nghỉ đông","放寒假","Nghỉ đông"], 
+            ["汗","hàn","Mồ hôi","出汗","Ra mồ hôi"], ["好处","hǎochu","Lợi ích","有什么好处","Có lợi ích gì"], ["好像","hǎoxiàng","Hình như","好像是他","Hình như là anh ấy"], 
+            ["号码","hàomǎ","Số","电话号码","Số điện thoại"], ["合格","hégé","Hợp lệ","合格产品","Sản phẩm hợp lệ"], ["合适","héshì","Thích hợp","很合适","Rất thích hợp"], 
+            ["盒子","hézi","Hộp","一个盒子","Một cái hộp"], ["后悔","hòuhuǐ","Hối hận","绝不后悔","Tuyệt đối không hối hận"], ["厚","hòu","Dày","这本书很厚","Quyển sách này rất dày"], 
+            ["互联网","hùliánwǎng","Internet","互联网时代","Thời đại internet"], ["互相","hùxiāng","Lẫn nhau","互相帮助","Giúp đỡ lẫn nhau"], ["护士","hùshi","Y tá","她是护士","Cô ấy là y tá"], 
+            ["怀疑","huáiyí","Hoài nghi","我怀疑","Tôi hoài nghi"], ["回忆","huíyì","Hồi ức","美好的回忆","Hồi ức đẹp"], ["活动","huódòng","Hoạt động","参加活动","Tham gia hoạt động"], 
+            ["活泼","huópō","Hoạt bát","性格活泼","Tính cách hoạt bát"], ["火","huǒ","Lửa/Hot","这歌很火","Bài hát này rất hot"], ["获得","huòdé","Đạt được","获得成功","Đạt được thành công"]
+        ];
+
+        // --- PROCESSING DATA ---
+        let fullVocabulary = [];
+
+        function processData(arr, level) {
+            return arr.map(item => ({
+                hsk: level,
+                hanzi: item[0],
+                pinyin: item[1],
+                meaning: item[2],
+                example: item[3],
+                example_meaning: item[4]
+            }));
+        }
+
+        fullVocabulary = [
+            ...processData(hsk1_data, 1),
+            ...processData(hsk2_data, 2),
+            ...processData(hsk3_data, 3),
+            ...processData(hsk4_data, 4)
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let currentLevel = 1;
+        let currentMode = 'list';
+        let filteredVocab = [];
+        let learnedWords = JSON.parse(localStorage.getItem('learnedWords')) || [];
+        let synth = window.speechSynthesis;
+        let voices = [];
+        let currentFlashcardIndex = 0;
+        
+        // Game State
+        let currentScore = 0;
+        let gameMode = 'practice'; // 'practice' or 'survival'
+
+        // --- INIT ---
+        window.onload = function() {
+            createSnowflakes();
+            loadVoices();
+            setLevel(1);
+            updateProgressDisplay();
+            
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+        };
+
+        // --- SNOWFALL EFFECT ---
+        function createSnowflakes() {
+            const container = document.getElementById('snow-container');
+            const snowflakeCount = 30;
+            const characters = ['❄', '❅', '❆', '•'];
+            
+            for (let i = 0; i < snowflakeCount; i++) {
+                const flake = document.createElement('div');
+                flake.className = 'snowflake';
+                flake.innerText = characters[Math.floor(Math.random() * characters.length)];
+                flake.style.left = Math.random() * 100 + '%';
+                flake.style.animationDelay = Math.random() * 5 + 's, ' + Math.random() * 3 + 's';
+                flake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+                flake.style.opacity = Math.random();
+                container.appendChild(flake);
+            }
+        }
+
+        // --- VOICE SETTINGS ---
+        function loadVoices() {
+            voices = synth.getVoices();
+            const voiceSelect = document.getElementById('voiceSelect');
+            voiceSelect.innerHTML = '';
+            
+            const zhVoices = voices.filter(v => v.lang.includes('zh'));
+            const otherVoices = voices.filter(v => !v.lang.includes('zh'));
+            const allVoices = [...zhVoices, ...otherVoices];
+
+            allVoices.forEach(voice => {
+                const option = document.createElement('option');
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.value = voice.name;
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('hidden');
+        }
+
+        function playAudio(elementIdOrText) {
+            let text = "";
+            if (document.getElementById(elementIdOrText)) {
+                text = document.getElementById(elementIdOrText).innerText;
+            } else {
+                text = elementIdOrText;
+            }
+
+            if (synth.speaking) {
+                synth.cancel();
+            }
+
+            const utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.lang = 'zh-CN';
+            utterThis.rate = document.getElementById('rateInput').value;
+            
+            const selectedVoiceName = document.getElementById('voiceSelect').value;
+            const selectedVoice = voices.find(v => v.name === selectedVoiceName);
+            if (selectedVoice) {
+                utterThis.voice = selectedVoice;
+            }
+
+            synth.speak(utterThis);
+        }
+
+        // --- NAVIGATION & LOGIC ---
+        function setLevel(level) {
+            currentLevel = level;
+            
+            const tabs = document.querySelectorAll('#levelTabs button');
+            tabs.forEach((btn, idx) => {
+                if (idx + 1 === level) {
+                    btn.className = "tab-btn active px-4 py-2 rounded-lg bg-white dark:bg-slate-700 shadow-sm border border-blue-100 dark:border-slate-600 text-sm font-bold text-blue-600 whitespace-nowrap transition transform scale-105";
+                } else {
+                    btn.className = "tab-btn px-4 py-2 rounded-lg bg-white/50 dark:bg-slate-800/50 shadow-sm border border-transparent text-sm font-medium text-gray-500 whitespace-nowrap hover:bg-white dark:hover:bg-slate-700 transition";
+                }
+            });
+
+            applyFilters();
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            ['list', 'flashcard', 'quiz'].forEach(m => {
+                const btn = document.getElementById(`btn-${m}`);
+                if (m === mode) {
+                    btn.className = "px-3 py-1.5 rounded-md bg-white dark:bg-slate-600 shadow text-blue-600 dark:text-blue-200 text-sm font-bold transition-all";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 text-sm font-medium hover:text-blue-600 transition-all";
+                }
+            });
+
+            document.getElementById('view-list').classList.add('hidden');
+            document.getElementById('view-flashcard').classList.add('hidden');
+            document.getElementById('view-quiz').classList.add('hidden');
+            
+            document.getElementById(`view-${mode}`).classList.remove('hidden');
+
+            if (mode === 'list') renderList();
+            if (mode === 'flashcard') { currentFlashcardIndex = 0; updateFlashcardUI(); }
+            if (mode === 'quiz') resetQuizView();
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            filteredVocab = fullVocabulary.filter(item => {
+                const matchLevel = item.hsk === currentLevel;
+                const matchSearch = item.hanzi.includes(searchTerm) || 
+                                    item.pinyin.toLowerCase().includes(searchTerm) || 
+                                    item.meaning.toLowerCase().includes(searchTerm);
+                return matchLevel && matchSearch;
+            });
+            
+            if (currentMode === 'list') renderList();
+            if (currentMode === 'flashcard') { currentFlashcardIndex = 0; updateFlashcardUI(); }
+            if (currentMode === 'quiz') resetQuizView();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+        // --- RENDER LIST ---
+        function renderList() {
+            const container = document.getElementById('view-list');
+            container.innerHTML = '';
+
+            if (filteredVocab.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400">Không tìm thấy từ vựng nào.</div>`;
+                return;
+            }
+
+            filteredVocab.forEach(item => {
+                const isLearned = learnedWords.includes(item.hanzi);
+                const card = document.createElement('div');
+                card.className = `glass-card p-5 rounded-2xl relative ${isLearned ? 'border-green-200 bg-green-50/50' : ''}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex flex-col">
+                            <h3 class="text-3xl font-bold text-blue-700 dark:text-blue-300 cn-font cursor-pointer hover:scale-110 transition-transform origin-left" onclick="playAudio('${item.hanzi}')">${item.hanzi}</h3>
+                            <span class="text-sm text-gray-500 font-mono">${item.pinyin}</span>
+                        </div>
+                        <button onclick="playAudio('${item.hanzi}')" class="text-blue-300 hover:text-blue-500 transition"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                    <div class="mb-3">
+                        <p class="font-bold text-slate-700 dark:text-slate-200">${item.meaning}</p>
+                    </div>
+                    <div class="text-sm bg-white/50 dark:bg-slate-700/50 p-2 rounded-lg border border-blue-50 dark:border-slate-600">
+                        <div class="flex justify-between">
+                            <p class="cn-font text-blue-900 dark:text-blue-100">${item.example}</p>
+                            <button onclick="playAudio('${item.example}')" class="ml-2 text-xs text-blue-400"><i class="fas fa-play"></i></button>
+                        </div>
+                        <p class="text-gray-500 dark:text-gray-400 text-xs mt-1 italic">${item.example_meaning}</p>
+                    </div>
+                    <button onclick="toggleLearnedInList('${item.hanzi}')" class="absolute top-2 right-2 p-1 ${isLearned ? 'text-green-500' : 'text-gray-200 hover:text-gray-400'}">
+                        <i class="fas fa-check-circle"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleLearnedInList(hanzi) {
+            if (learnedWords.includes(hanzi)) {
+                learnedWords = learnedWords.filter(w => w !== hanzi);
+            } else {
+                learnedWords.push(hanzi);
+            }
+            localStorage.setItem('learnedWords', JSON.stringify(learnedWords));
+            updateProgressDisplay();
+            renderList();
+        }
+
+        // --- FLASHCARD LOGIC ---
+        function updateFlashcardUI() {
+            if (filteredVocab.length === 0) return;
+            const item = filteredVocab[currentFlashcardIndex];
+            
+            document.getElementById('flashcard-inner').style.transform = "rotateY(0deg)";
+
+            document.getElementById('fc-hanzi').innerText = item.hanzi;
+            document.getElementById('fc-front-pinyin').innerText = item.pinyin;
+            document.getElementById('fc-pinyin').innerText = item.pinyin;
+            document.getElementById('fc-meaning').innerText = item.meaning;
+            document.getElementById('fc-example').innerText = item.example;
+            document.getElementById('fc-example-meaning').innerText = item.example_meaning;
+        }
+
+        function flipCard(el) {
+            const inner = el.querySelector('#flashcard-inner');
+            if (inner.style.transform === "rotateY(180deg)") {
+                inner.style.transform = "rotateY(0deg)";
+            } else {
+                inner.style.transform = "rotateY(180deg)";
+            }
+        }
+
+        function nextFlashcard() {
+            if (currentFlashcardIndex < filteredVocab.length - 1) {
+                currentFlashcardIndex++;
+                updateFlashcardUI();
+            }
+        }
+
+        function prevFlashcard() {
+            if (currentFlashcardIndex > 0) {
+                currentFlashcardIndex--;
+                updateFlashcardUI();
+            }
+        }
+
+        function markLearned() {
+            const item = filteredVocab[currentFlashcardIndex];
+            if (!learnedWords.includes(item.hanzi)) {
+                learnedWords.push(item.hanzi);
+                localStorage.setItem('learnedWords', JSON.stringify(learnedWords));
+                updateProgressDisplay();
+            }
+            nextFlashcard();
+        }
+
+        // --- QUIZ & GAME LOGIC ---
+        function resetQuizView() {
+            document.getElementById('game-selection').classList.remove('hidden');
+            document.getElementById('quiz-interface').classList.add('hidden');
+            document.getElementById('game-over').classList.add('hidden');
+        }
+
+        function startQuiz(mode) {
+            if (filteredVocab.length < 4) {
+                alert("Cần ít nhất 4 từ vựng để chơi!");
+                return;
+            }
+            gameMode = mode;
+            currentScore = 0;
+            document.getElementById('quiz-score').innerText = 0;
+            document.getElementById('game-selection').classList.add('hidden');
+            document.getElementById('quiz-interface').classList.remove('hidden');
+            document.getElementById('game-over').classList.add('hidden');
+            nextQuizQuestion();
+        }
+
+        function nextQuizQuestion() {
+            document.getElementById('btn-next-quiz').classList.add('hidden');
+            document.getElementById('quiz-feedback').innerText = "";
+            document.getElementById('quiz-feedback').className = "mt-4 font-bold text-lg min-h-[1.75rem]";
+
+            const questionItem = filteredVocab[Math.floor(Math.random() * filteredVocab.length)];
+            document.getElementById('quiz-question').innerText = questionItem.hanzi;
+
+            let options = [questionItem];
+            while (options.length < 4) {
+                const randomItem = filteredVocab[Math.floor(Math.random() * filteredVocab.length)];
+                if (!options.includes(randomItem)) {
+                    options.push(randomItem);
+                }
+            }
+            options = options.sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 rounded-xl border-2 border-blue-100 dark:border-slate-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition font-semibold text-slate-700 dark:text-slate-200";
+                btn.innerText = opt.meaning;
+                btn.onclick = () => checkAnswer(opt, questionItem, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, btnElement) {
+            const allBtns = document.getElementById('quiz-options').children;
+            for (let btn of allBtns) {
+                btn.disabled = true;
+                if (btn.innerText === correct.meaning) {
+                    btn.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+                }
+            }
+
+            const feedback = document.getElementById('quiz-feedback');
+            
+            if (selected.hanzi === correct.hanzi) {
+                // CORRECT
+                currentScore += 10;
+                document.getElementById('quiz-score').innerText = currentScore;
+                feedback.innerText = "Chính xác! 🎉";
+                feedback.classList.add('text-green-600');
+                playAudio("Đúng rồi"); // Có thể đổi thành âm thanh ngắn
+                
+                // Auto next if survival? Or manual? Let's keep manual for reading
+                document.getElementById('btn-next-quiz').classList.remove('hidden');
+            } else {
+                // WRONG
+                btnElement.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
+                document.getElementById('quiz-interface').classList.add('shake-anim');
+                setTimeout(() => document.getElementById('quiz-interface').classList.remove('shake-anim'), 500);
+
+                feedback.innerText = `Sai rồi. Đáp án là: ${correct.pinyin}`;
+                feedback.classList.add('text-red-600');
+
+                if (gameMode === 'survival') {
+                    setTimeout(endGame, 1500);
+                } else {
+                    document.getElementById('btn-next-quiz').classList.remove('hidden');
+                }
+            }
+        }
+
+        function endGame() {
+            document.getElementById('quiz-interface').classList.add('hidden');
+            document.getElementById('game-over').classList.remove('hidden');
+            document.getElementById('final-score').innerText = currentScore;
+        }
+
+        function quitQuiz() {
+            resetQuizView();
+        }
+
+        // --- UTILS ---
+        function updateProgressDisplay() {
+            document.getElementById('progressCount').innerText = learnedWords.length;
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            const icon = document.getElementById('themeIcon');
+            if (document.body.classList.contains('dark')) {
+                icon.className = 'fas fa-sun text-yellow-300';
+            } else {
+                icon.className = 'fas fa-moon text-blue-600';
+            }
+        }
+
+    </script>
+</body>
+</html>
